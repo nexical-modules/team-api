@@ -1,0 +1,300 @@
+config:
+  test:
+    roles:
+      team-owner: { name: 'Owner Team' }
+      team-admin: { name: 'Admin Team' }
+      team-member: { name: 'Member Team' }
+
+enums:
+  TeamRole:
+    values:
+      - OWNER
+      - ADMIN
+      - MEMBER
+
+models:
+  Team:
+    default: true
+    role:
+      list: team-member
+      get: team-member
+      create: "none"
+      update: team-admin
+      delete: team-owner
+    test:
+      actor: team
+    actor:
+      name: team
+      prefix: sk_team_
+      strategy: bearer
+      fields:
+        tokenModel: TeamApiKey
+        ownerField: teamId
+        keyField: hashedKey
+    fields:
+      id:
+        type: String
+        attributes:
+          - "@id"
+          - "@default(cuid())"
+      name:
+        type: String
+      createdAt:
+        type: DateTime
+        attributes:
+          - "@default(now())"
+      updatedAt:
+        type: DateTime
+        attributes:
+          - "@updatedAt"
+      members:
+        type: TeamMember
+        isList: true
+      invitations:
+        type: Invitation
+        isList: true
+      apiKeys:
+        type: TeamApiKey
+        isList: true
+
+  TeamApiKey:
+    role:
+      create: "none"
+      update: "none"
+      delete: team-owner
+      list: team-owner
+      get: team-owner
+    test:
+      actor: team
+    fields:
+      id:
+        type: String
+        attributes:
+          - "@id"
+          - "@default(cuid())"
+      name:
+        type: String
+      hashedKey:
+        type: String
+        attributes:
+          - "@unique"
+      prefix:
+        type: String
+      lastUsedAt:
+        type: DateTime
+        isRequired: false
+      createdAt:
+        type: DateTime
+        attributes:
+          - "@default(now())"
+      teamId:
+        type: String
+      team:
+        type: Team
+        attributes:
+          - "@relation(fields: [teamId], references: [id], onDelete: Cascade)"
+
+  TeamMember:
+    role:
+      create: "none"
+      list: team-member
+      get: team-member
+      update: team-owner
+      delete: team-owner
+    test:
+      actor: team
+    fields:
+      id:
+        type: String
+        attributes:
+          - "@id"
+          - "@default(cuid())"
+      role:
+        type: TeamRole
+        attributes:
+          - "@default(MEMBER)"
+      userId:
+        type: String
+      teamId:
+        type: String
+      user:
+        type: User
+        attributes:
+          - "@relation(fields: [userId], references: [id], onDelete: Cascade)"
+      team:
+        type: Team
+        attributes:
+          - "@relation(fields: [teamId], references: [id], onDelete: Cascade)"
+      createdAt:
+        type: DateTime
+        attributes:
+          - "@default(now())"
+      updatedAt:
+        type: DateTime
+        attributes:
+          - "@updatedAt"
+    attributes:
+      - "@@unique([userId, teamId])"
+      - "@@index([userId])"
+      - "@@index([teamId])"
+
+  Invitation:
+    role:
+      create: "none"
+      list: team-admin
+      delete: team-admin
+    test:
+      actor: user
+    fields:
+      id:
+        type: String
+        attributes:
+          - "@id"
+          - "@default(cuid())"
+      email:
+        type: String
+        # Override: Remove @unique from user module definition by providing empty attributes list
+        # We replace it with composite unique constraint below
+        attributes: [] 
+      teamRole:
+        type: TeamRole
+        attributes:
+          - "@default(MEMBER)"
+      teamId:
+        type: String
+        isRequired: false
+      team:
+        type: Team
+        isRequired: false
+        attributes:
+          - "@relation(fields: [teamId], references: [id], onDelete: Cascade)"
+      inviterId:
+        type: String
+        isRequired: false
+      inviter:
+        type: User
+        isRequired: false
+        attributes:
+          - "@relation(\"InvitationInviter\", fields: [inviterId], references: [id], onDelete: Cascade)"
+      token:
+        type: String
+        attributes:
+           - "@unique"
+      expires:
+        type: DateTime
+      createdAt:
+        type: DateTime
+        attributes:
+          - "@default(now())"
+      updatedAt:
+        type: DateTime
+        attributes:
+          - "@updatedAt"
+    attributes:
+      - "@@unique([teamId, email])"
+      - "@@index([teamId])"
+      - "@@index([inviterId])"
+      - "@@index([token])"
+
+  # DTOs
+  CreateTeamDTO:
+    db: false
+    api: false
+    fields:
+      name:
+        type: String
+        isRequired: true
+
+  UpdateTeamDTO:
+    db: false
+    api: false
+    fields:
+      name:
+        type: String
+        isRequired: false
+
+  CreateTeamApiKeyDTO:
+    db: false
+    api: false
+    fields:
+      teamId:
+        type: String
+        isRequired: true
+      name:
+        type: String
+        isRequired: true
+      expiresAt:
+        type: DateTime
+        isRequired: false
+
+  InviteTeamMemberDTO:
+    db: false
+    api: false
+    fields:
+      teamId:
+        type: String
+        isRequired: true
+      email:
+        type: String
+        isRequired: true
+      role:
+        type: TeamRole
+        isRequired: false
+
+  UpdateTeamMemberDTO:
+    db: false
+    api: false
+    fields:
+      role:
+        type: TeamRole
+        isRequired: true
+
+  AcceptInvitationDTO:
+    db: false
+    api: false
+    fields:
+      token:
+        type: String
+        isRequired: true
+
+  ResendInvitationDTO:
+    db: false
+    api: false
+    fields:
+      invitationId:
+        type: String
+        isRequired: false
+
+  ListInvitationsDTO:
+    db: false
+    api: false
+    fields:
+      teamId:
+        type: String
+        isRequired: true
+
+  # Extend User to add memberships relation
+  User:
+    extended: true
+    fields:
+      id:
+        type: String
+      name:
+        type: String
+      email:
+        type: String
+      username:
+        type: String
+      image:
+        type: String
+      password:
+        type: String
+        private: true
+      memberships:
+        type: TeamMember
+        isList: true
+      sentInvitations:
+        type: Invitation
+        isList: true
+        attributes:
+          - "@relation(\"InvitationInviter\", fields: [], references: [])"

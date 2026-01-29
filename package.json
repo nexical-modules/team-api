@@ -1,0 +1,13 @@
+{
+    "name": "@modules/team-api",
+    "version": "0.1.0",
+    "type": "module",
+    "private": true,
+    "exports": {
+        "./*": "./src/*"
+    },
+    "dependencies": {
+        "@prisma/client": "7.3.0",
+        "zod": "^3.22.4"
+    }
+}

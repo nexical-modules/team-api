@@ -1,0 +1,57 @@
+Team:
+  - path: /create
+    verb: POST
+    method: createTeam
+    summary: Create a new team
+    input: CreateTeamDTO
+    output: Team
+    role: member
+    action: create-team
+
+TeamMember:
+  - path: /invitations
+    verb: GET
+    method: listInvitations
+    summary: List team invitations
+    input: ListInvitationsDTO
+    output: Invitation[]
+    role: member
+
+  - path: /invitations
+    verb: POST
+    method: inviteMember
+    summary: Invite a new team member
+    input: InviteTeamMemberDTO
+    output: Invitation
+    role: team-admin
+    action: invite-team-member
+
+  - path: /invitations/[id]/resend
+    verb: POST
+    method: resendInvitation
+    summary: Resend invitation email
+    input: ResendInvitationDTO
+    role: team-admin
+
+  - path: /invitations/accept
+    verb: POST
+    method: acceptInvitation
+    summary: Accept an invitation
+    input: AcceptInvitationDTO
+    role: member
+
+  - path: /invitations/[id]
+    verb: DELETE
+    method: deleteInvitation
+    summary: Cancel/Delete an invitation
+    role: team-admin
+
+TeamApiKey:
+  - path: /keys
+    verb: POST
+    method: createKey
+    summary: Create a new API Key (returns raw key)
+    input: CreateTeamApiKeyDTO
+    output: TeamApiKey
+    role: team-owner
+    action: create-team-api-key
