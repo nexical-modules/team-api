@@ -2,7 +2,7 @@
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { parseQuery } from '@/lib/api/api-query';
-import { z } from 'zod';
+
 import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
 import { HookSystem } from '@/lib/modules/hooks';
 

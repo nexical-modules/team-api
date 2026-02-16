@@ -2,8 +2,7 @@
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { parseQuery } from '@/lib/api/api-query';
-import { z } from 'zod';
-import { TeamService } from '@modules/team-api/src/services/team-service';
+
 import { HookSystem } from '@/lib/modules/hooks';
 
 export const GET = defineApi(

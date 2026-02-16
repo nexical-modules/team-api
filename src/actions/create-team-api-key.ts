@@ -3,9 +3,7 @@
 // Let's check `user-api` actions for pattern.
 // Usually they are just classes with `run`.
 
-import { db } from '@/lib/core/db';
 import type { CreateTeamApiKeyDTO, TeamApiKey } from '../sdk/types'; // Generated types
-import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
 
 export class CreateTeamApiKeyAction {

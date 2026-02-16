@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
-import { z } from 'zod';
+
 import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
 export const GET = defineApi(
   async (context, actor) => {

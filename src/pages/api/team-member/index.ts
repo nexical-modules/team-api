@@ -2,10 +2,8 @@
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { parseQuery } from '@/lib/api/api-query';
-import { z } from 'zod';
 import { TeamMemberService } from '@modules/team-api/src/services/team-member-service';
 import { HookSystem } from '@/lib/modules/hooks';
-import type { TeamApiModuleTypes } from '@/lib/api';
 
 export const GET = defineApi(
   async (context, actor) => {

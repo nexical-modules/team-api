@@ -31,6 +31,7 @@ describe('TeamMember API - Update', () => {
       const updated = await Factory.prisma.teamMember.findUnique({
         where: { id: target.id },
       });
+      expect(updated).toBeDefined();
     });
   });
 });

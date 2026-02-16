@@ -40,7 +40,6 @@ describe('TeamMember API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const actor = await client.as('team', { name: 'Member Team' });
 
       // Cleanup and seed specific count

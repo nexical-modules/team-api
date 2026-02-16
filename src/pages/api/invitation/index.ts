@@ -3,9 +3,7 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { parseQuery } from '@/lib/api/api-query';
 import { HookSystem } from '@/lib/modules/hooks';
-import { z } from 'zod';
 import { InvitationService } from '@modules/team-api/src/services/invitation-service';
-import type { TeamApiModuleTypes } from '@/lib/api';
 
 export const GET = defineApi(
   async (context, actor) => {
