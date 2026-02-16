@@ -1,19 +1,16 @@
 // GENERATED CODE - DO NOT MODIFY
-import { defineApi } from "@/lib/api/api-docs";
-import { ApiGuard } from "@/lib/api/api-guard";
-import { HookSystem } from "@/lib/modules/hooks";
-import { z } from "zod";
-import { InvitationService } from "@modules/team-api/src/services/invitation-service";
-import { TeamRole } from "@modules/team-api/src/sdk";
+import { defineApi } from '@/lib/api/api-docs';
+import { ApiGuard } from '@/lib/api/api-guard';
+import { z } from 'zod';
+import { InvitationService } from '@modules/team-api/src/services/invitation-service';
+import type { TeamApiModuleTypes } from '@/lib/api';
 
-// GENERATED CODE - DO NOT MODIFY
 export const GET = defineApi(
-  async (context) => {
+  async (context, actor) => {
     const { id } = context.params;
-    if (!id) return new Response(null, { status: 404 });
 
-    // Pre-check
-    await ApiGuard.protect(context, "member", { ...context.params });
+    // Security Check
+    await ApiGuard.protect(context, 'member', { ...context.params });
 
     const select = {
       id: true,
@@ -38,56 +35,53 @@ export const GET = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-    const result = await InvitationService.get(id, select);
 
-    if (!result.success || !result.data) {
-      return new Response(null, { status: 404 });
+    const result = await InvitationService.get(id, select, actor);
+
+    if (!result.success) {
+      if (
+        result.error?.code === 'NOT_FOUND' ||
+        (typeof result.error === 'string' && result.error.includes('not_found'))
+      ) {
+        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
+      }
+      return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
 
-    // Post-check (Data ownership)
-    await ApiGuard.protect(
-      context,
-      "member",
-      { ...context.params },
-      result.data,
-    );
-
-    // Analytics Hook
-    const actor = (context as any).user;
-    await HookSystem.dispatch("invitation.viewed", {
-      id,
-      actorId: actor?.id || "anonymous",
-    });
+    if (!result.data) {
+      return new Response(
+        JSON.stringify({ error: { code: 'NOT_FOUND', message: 'Invitation not found' } }),
+        { status: 404 },
+      );
+    }
 
     return { success: true, data: result.data };
   },
   {
-    summary: "Get Invitation",
-    tags: ["Invitation"],
-    parameters: [
-      { name: "id", in: "path", required: true, schema: { type: "string" } },
-    ],
+    summary: 'Get Invitation',
+    tags: ['Invitation'],
+    parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
     responses: {
       200: {
-        description: "OK",
+        description: 'OK',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              type: "object",
+              type: 'object',
               properties: {
-                id: { type: "string" },
-                email: { type: "string" },
-                teamRole: { type: "string" },
-                teamId: { type: "string" },
-                team: { type: "string" },
-                inviterId: { type: "string" },
-                inviter: { type: "string" },
-                token: { type: "string" },
-                expires: { type: "string", format: "date-time" },
-                createdAt: { type: "string", format: "date-time" },
-                updatedAt: { type: "string", format: "date-time" },
+                id: { type: 'string' },
+                email: { type: 'string' },
+                teamRole: { type: 'string' },
+                teamId: { type: 'string' },
+                team: { type: 'string' },
+                inviterId: { type: 'string' },
+                inviter: { type: 'string' },
+                token: { type: 'string' },
+                expires: { type: 'string', format: 'date-time' },
+                createdAt: { type: 'string', format: 'date-time' },
+                updatedAt: { type: 'string', format: 'date-time' },
               },
-              required: ["email", "token", "expires", "updatedAt"],
+              required: ['email', 'token', 'expires', 'updatedAt'],
             },
           },
         },
@@ -96,40 +90,25 @@ export const GET = defineApi(
   },
 );
 export const PUT = defineApi(
-  async (context) => {
+  async (context, actor) => {
     const { id } = context.params;
-    if (!id) return new Response(null, { status: 404 });
-
     const body = await context.request.json();
 
-    // Pre-check
-    await ApiGuard.protect(context, "member", { ...context.params, ...body });
-
-    // Fetch for Post-check ownership
-    const existing = await InvitationService.get(id);
-    if (!existing.success || !existing.data) {
-      return new Response(null, { status: 404 });
-    }
-
-    // Post-check
-    await ApiGuard.protect(
-      context,
-      "member",
-      { ...context.params, ...body },
-      existing.data,
-    );
+    // Security Check
+    await ApiGuard.protect(context, 'member', { ...context.params, ...body });
 
     // Zod Validation
     const schema = z
       .object({
         email: z.string(),
-        teamRole: z.nativeEnum(TeamRole).optional(),
+        teamRole: z.nativeEnum(TeamApiModuleTypes.TeamRole).optional(),
         teamId: z.string().optional(),
         inviterId: z.string().optional(),
         token: z.string(),
         expires: z.string().datetime(),
       })
       .partial();
+
     const validated = schema.parse(body);
     const select = {
       id: true,
@@ -154,41 +133,42 @@ export const PUT = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-    const actor = context.locals?.actor || (context as any).user;
 
     const result = await InvitationService.update(id, validated, select, actor);
 
     if (!result.success) {
-      return new Response(JSON.stringify({ error: result.error }), {
-        status: 400,
-      });
+      if (
+        result.error?.code === 'NOT_FOUND' ||
+        (typeof result.error === 'string' && result.error.includes('not_found'))
+      ) {
+        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
+      }
+      return new Response(JSON.stringify({ error: result.error }), { status: 400 });
     }
 
-    return { success: true, data: result.data };
+    return new Response(JSON.stringify({ success: true, data: result.data }), { status: 200 });
   },
   {
-    summary: "Update Invitation",
-    tags: ["Invitation"],
-    parameters: [
-      { name: "id", in: "path", required: true, schema: { type: "string" } },
-    ],
+    summary: 'Update Invitation',
+    tags: ['Invitation'],
+    parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
     requestBody: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
-              id: { type: "string" },
-              email: { type: "string" },
-              teamRole: { type: "string" },
-              teamId: { type: "string" },
-              team: { type: "string" },
-              inviterId: { type: "string" },
-              inviter: { type: "string" },
-              token: { type: "string" },
-              expires: { type: "string", format: "date-time" },
-              createdAt: { type: "string", format: "date-time" },
-              updatedAt: { type: "string", format: "date-time" },
+              id: { type: 'string' },
+              email: { type: 'string' },
+              teamRole: { type: 'string' },
+              teamId: { type: 'string' },
+              team: { type: 'string' },
+              inviterId: { type: 'string' },
+              inviter: { type: 'string' },
+              token: { type: 'string' },
+              expires: { type: 'string', format: 'date-time' },
+              createdAt: { type: 'string', format: 'date-time' },
+              updatedAt: { type: 'string', format: 'date-time' },
             },
           },
         },
@@ -196,25 +176,25 @@ export const PUT = defineApi(
     },
     responses: {
       200: {
-        description: "OK",
+        description: 'OK',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              type: "object",
+              type: 'object',
               properties: {
-                id: { type: "string" },
-                email: { type: "string" },
-                teamRole: { type: "string" },
-                teamId: { type: "string" },
-                team: { type: "string" },
-                inviterId: { type: "string" },
-                inviter: { type: "string" },
-                token: { type: "string" },
-                expires: { type: "string", format: "date-time" },
-                createdAt: { type: "string", format: "date-time" },
-                updatedAt: { type: "string", format: "date-time" },
+                id: { type: 'string' },
+                email: { type: 'string' },
+                teamRole: { type: 'string' },
+                teamId: { type: 'string' },
+                team: { type: 'string' },
+                inviterId: { type: 'string' },
+                inviter: { type: 'string' },
+                token: { type: 'string' },
+                expires: { type: 'string', format: 'date-time' },
+                createdAt: { type: 'string', format: 'date-time' },
+                updatedAt: { type: 'string', format: 'date-time' },
               },
-              required: ["email", "token", "expires", "updatedAt"],
+              required: ['email', 'token', 'expires', 'updatedAt'],
             },
           },
         },
@@ -223,52 +203,39 @@ export const PUT = defineApi(
   },
 );
 export const DELETE = defineApi(
-  async (context) => {
+  async (context, actor) => {
     const { id } = context.params;
-    if (!id) return new Response(null, { status: 404 });
 
-    // Pre-check
-    await ApiGuard.protect(context, "team-admin", { ...context.params });
+    // Security Check
+    await ApiGuard.protect(context, 'team-admin', { ...context.params });
 
-    // Fetch for Post-check ownership
-    const existing = await InvitationService.get(id);
-    if (!existing.success || !existing.data) {
-      return new Response(null, { status: 404 });
-    }
-
-    // Post-check
-    await ApiGuard.protect(
-      context,
-      "team-admin",
-      { ...context.params },
-      existing.data,
-    );
-
-    const result = await InvitationService.delete(id);
+    const result = await InvitationService.delete(id, actor);
 
     if (!result.success) {
-      return new Response(JSON.stringify({ error: result.error }), {
-        status: 400,
-      });
+      if (
+        result.error?.code === 'NOT_FOUND' ||
+        (typeof result.error === 'string' && result.error.includes('not_found'))
+      ) {
+        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
+      }
+      return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
 
     return { success: true };
   },
   {
-    summary: "Delete Invitation",
-    tags: ["Invitation"],
-    parameters: [
-      { name: "id", in: "path", required: true, schema: { type: "string" } },
-    ],
+    summary: 'Delete Invitation',
+    tags: ['Invitation'],
+    parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
     responses: {
       200: {
-        description: "OK",
+        description: 'OK',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              type: "object",
+              type: 'object',
               properties: {
-                success: { type: "boolean" },
+                success: { type: 'boolean' },
               },
             },
           },

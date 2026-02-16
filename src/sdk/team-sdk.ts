@@ -1,24 +1,18 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-import { BaseResource, ApiClient } from "@nexical/sdk-core";
-import type { Team, CreateTeamDTO } from "./types";
+// GENERATED CODE - DO NOT MODIFY
+import { BaseResource } from '@nexical/sdk-core';
+import type { Team, CreateTeamDTO } from './types.js';
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 /** SDK client for Team. */
 export class TeamSDK extends BaseResource {
   public async list(params?: {
     search?: string;
     take?: number;
     skip?: number;
-    orderBy?: string | Record<string, "asc" | "desc">;
-    filters?: Record<string, any>;
-  }): Promise<{
-    success: boolean;
-    data: Team[];
-    error?: string;
-    meta: { total: number };
-  }> {
+    orderBy?: string | Record<string, 'asc' | 'desc'>;
+    filters?: Record<string, unknown>;
+  }): Promise<{ success: boolean; data: Team[]; error?: string; meta: { total: number } }> {
     let orderBy = params?.orderBy;
-    if (orderBy && typeof orderBy === "object") {
+    if (orderBy && typeof orderBy === 'object') {
       const keys = Object.keys(orderBy);
       if (keys.length > 0) {
         orderBy = `${keys[0]}:${orderBy[keys[0]]}`;
@@ -31,31 +25,27 @@ export class TeamSDK extends BaseResource {
       skip: params?.skip,
       orderBy,
     });
-    return this._request("GET", `/team${query}`);
+    return this._request('GET', `/team${query}`);
   }
 
-  public async get(
-    id: string,
-  ): Promise<{ success: boolean; data: Team; error?: string }> {
-    return this._request("GET", `/team/${id}`);
+  public async get(id: string): Promise<{ success: boolean; data: Team; error?: string }> {
+    return this._request('GET', `/team/${id}`);
   }
 
   public async update(
     id: string,
     data: Partial<Team>,
   ): Promise<{ success: boolean; data: Team; error?: string }> {
-    return this._request("PUT", `/team/${id}`, data);
+    return this._request('PUT', `/team/${id}`, data);
   }
 
-  public async delete(
-    id: string,
-  ): Promise<{ success: boolean; error?: string }> {
-    return this._request("DELETE", `/team/${id}`);
+  public async delete(id: string): Promise<{ success: boolean; error?: string }> {
+    return this._request('DELETE', `/team/${id}`);
   }
 
   public async createTeam(
     data: CreateTeamDTO,
   ): Promise<{ success: boolean; data: Team; error?: string }> {
-    return this._request("POST", `/team/create`, data);
+    return this._request('POST', `/team/create`, data);
   }
 }

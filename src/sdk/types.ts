@@ -1,3 +1,4 @@
+// GENERATED CODE - DO NOT MODIFY
 export interface CreateTeamDTO {
   name: string;
 }
@@ -34,34 +35,11 @@ export interface ListInvitationsDTO {
   teamId: string;
 }
 
-export type TeamRole = (typeof TeamRole)[keyof typeof TeamRole];
-
-export const TeamRole = {
-  OWNER: "OWNER",
-  ADMIN: "ADMIN",
-  MEMBER: "MEMBER",
-} as const;
-
-import type {
-  Team,
-  TeamApiKey,
-  TeamMember,
-  Invitation,
-  User,
-} from "@prisma/client";
-
 export type { Team, TeamApiKey, TeamMember, Invitation, User };
+export type { Team, TeamApiKey, TeamMember, Invitation, User } from '@prisma/client';
 
-export type TeamWithRelations = Team & {
-  members: (TeamMember & { user: User })[];
-  invitations: Invitation[];
-  apiKeys?: TeamApiKey[];
-};
-
-export type {
-  Team,
-  TeamApiKey,
-  TeamMember,
-  Invitation,
-  User,
-} from "@prisma/client";
+export enum TeamRole {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  MEMBER = 'MEMBER',
+}

@@ -1,12 +1,13 @@
-import type { ServiceResponse } from "@/types/service";
-import type { APIContext } from "astro";
-import type { ResendInvitationDTO } from "../sdk/types";
+// GENERATED CODE - DO NOT MODIFY
+import type { ServiceResponse } from '@/types/service';
+import type { APIContext } from 'astro';
+import type { ResendInvitationDTO } from '../sdk/types';
 
 export class ResendInvitationTeamMemberAction {
   public static async run(
     input: ResendInvitationDTO,
     context: APIContext,
-  ): Promise<ServiceResponse<any>> {
+  ): Promise<ServiceResponse<void>> {
     return { success: true, data: {} as any };
   }
 }

@@ -1,9 +1,8 @@
-import { db } from "@/lib/core/db";
-import type { ServiceResponse } from "@/types/service";
-import type { APIContext } from "astro";
-import type { CreateTeamDTO, Team } from "../sdk/types";
-import { TeamRole } from "@modules/team-api/src/sdk";
-import { HookSystem } from "@/lib/modules/hooks";
+// GENERATED CODE - DO NOT MODIFY
+import { db } from '@/lib/core/db';
+import type { ServiceResponse } from '@/types/service';
+import type { APIContext } from 'astro';
+import type { CreateTeamDTO, Team } from '../sdk/types';
 
 export class CreateTeamAction {
   public static async run(
@@ -11,10 +10,9 @@ export class CreateTeamAction {
     context: APIContext,
   ): Promise<ServiceResponse<Team>> {
     const { name } = input;
-    const userId =
-      (context.locals.actor as any)?.id || (context as any).user?.id;
+    const userId = (context.locals.actor as any)?.id || (context as any).user?.id;
 
-    if (!userId) return { success: false, error: "Unauthorized" };
+    if (!userId) return { success: false, error: 'Unauthorized' };
 
     try {
       // 1. Enforce Limit
@@ -23,7 +21,7 @@ export class CreateTeamAction {
       });
 
       if (teamCount >= 10) {
-        return { success: false, error: "team.service.error.limit_reached" };
+        return { success: false, error: 'team.service.error.limit_reached' };
       }
 
       // 2. Create Team & Owner
@@ -40,7 +38,7 @@ export class CreateTeamAction {
       });
 
       // 3. Side Effects
-      await HookSystem.dispatch("team.created", {
+      await HookSystem.dispatch('team.created', {
         teamId: team.id,
         name: team.name,
         ownerId: userId,
@@ -49,7 +47,7 @@ export class CreateTeamAction {
       return { success: true, data: team };
     } catch (error: any) {
       console.error(error);
-      return { success: false, error: "team.service.error.create_failed" };
+      return { success: false, error: 'team.service.error.create_failed' };
     }
   }
 }

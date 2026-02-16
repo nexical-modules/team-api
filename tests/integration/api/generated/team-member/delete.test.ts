@@ -1,11 +1,9 @@
 // GENERATED CODE - DO NOT MODIFY
-import { describe, it, expect, beforeEach } from "vitest";
-import { ApiClient } from "@tests/integration/lib/client";
-import { Factory } from "@tests/integration/lib/factory";
-import { TestServer } from "@tests/integration/lib/server";
-import { db } from "@/lib/core/db";
-
-const _test = describe("TeamMember API - Delete", () => {
+import { describe, it, expect, beforeEach } from 'vitest';
+import { ApiClient } from '@tests/integration/lib/client';
+import { Factory } from '@tests/integration/lib/factory';
+import { TestServer } from '@tests/integration/lib/server';
+describe('TeamMember API - Delete', () => {
   let client: ApiClient;
 
   beforeEach(async () => {
@@ -13,12 +11,12 @@ const _test = describe("TeamMember API - Delete", () => {
   });
 
   // DELETE /api/team-member/[id]
-  describe("DELETE /api/team-member/[id]", () => {
-    it("should delete teamMember", async () => {
-      const actor = await client.as("team", { name: "Owner Team" });
+  describe('DELETE /api/team-member/[id]', () => {
+    it('should delete teamMember', async () => {
+      const actor = await client.as('team', { name: 'Owner Team' });
 
-      const user_0 = await Factory.create("user", {});
-      const target = await Factory.create("teamMember", {
+      const user_0 = await Factory.create('user', {});
+      const target = await Factory.create('teamMember', {
         ...{},
         team: { connect: { id: actor.id } },
         user: { connect: { id: user_0.id } },

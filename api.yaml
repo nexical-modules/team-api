@@ -31,6 +31,7 @@ TeamMember:
     method: resendInvitation
     summary: Resend invitation email
     input: ResendInvitationDTO
+    output: none
     role: team-admin
 
   - path: /invitations/accept
@@ -38,12 +39,15 @@ TeamMember:
     method: acceptInvitation
     summary: Accept an invitation
     input: AcceptInvitationDTO
+    output: none
     role: member
 
   - path: /invitations/[id]
     verb: DELETE
     method: deleteInvitation
     summary: Cancel/Delete an invitation
+    input: none
+    output: none
     role: team-admin
 
 TeamApiKey:

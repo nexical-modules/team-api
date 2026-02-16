@@ -1,18 +1,16 @@
 // GENERATED CODE - DO NOT MODIFY
-import { defineApi } from "@/lib/api/api-docs";
-import { ApiGuard } from "@/lib/api/api-guard";
-import { z } from "zod";
-import { TeamMemberService } from "@modules/team-api/src/services/team-member-service";
-import { TeamRole } from "@modules/team-api/src/sdk";
-import { HookSystem } from "@/lib/modules/hooks";
-// GENERATED CODE - DO NOT MODIFY
-export const GET = defineApi(
-  async (context) => {
-    const { id } = context.params;
-    if (!id) return new Response(null, { status: 404 });
+import { defineApi } from '@/lib/api/api-docs';
+import { ApiGuard } from '@/lib/api/api-guard';
+import { z } from 'zod';
+import { TeamMemberService } from '@modules/team-api/src/services/team-member-service';
+import type { TeamApiModuleTypes } from '@/lib/api';
 
-    // Pre-check
-    await ApiGuard.protect(context, "team-member", { ...context.params });
+export const GET = defineApi(
+  async (context, actor) => {
+    const { id } = context.params;
+
+    // Security Check
+    await ApiGuard.protect(context, 'team-member', { ...context.params });
 
     const select = {
       id: true,
@@ -34,53 +32,50 @@ export const GET = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-    const result = await TeamMemberService.get(id, select);
 
-    if (!result.success || !result.data) {
-      return new Response(null, { status: 404 });
+    const result = await TeamMemberService.get(id, select, actor);
+
+    if (!result.success) {
+      if (
+        result.error?.code === 'NOT_FOUND' ||
+        (typeof result.error === 'string' && result.error.includes('not_found'))
+      ) {
+        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
+      }
+      return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
 
-    // Post-check (Data ownership)
-    await ApiGuard.protect(
-      context,
-      "team-member",
-      { ...context.params },
-      result.data,
-    );
-
-    // Analytics Hook
-    const actor = (context as any).user;
-    await HookSystem.dispatch("teamMember.viewed", {
-      id,
-      actorId: actor?.id || "anonymous",
-    });
+    if (!result.data) {
+      return new Response(
+        JSON.stringify({ error: { code: 'NOT_FOUND', message: 'TeamMember not found' } }),
+        { status: 404 },
+      );
+    }
 
     return { success: true, data: result.data };
   },
   {
-    summary: "Get TeamMember",
-    tags: ["TeamMember"],
-    parameters: [
-      { name: "id", in: "path", required: true, schema: { type: "string" } },
-    ],
+    summary: 'Get TeamMember',
+    tags: ['TeamMember'],
+    parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
     responses: {
       200: {
-        description: "OK",
+        description: 'OK',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              type: "object",
+              type: 'object',
               properties: {
-                id: { type: "string" },
-                role: { type: "string" },
-                userId: { type: "string" },
-                teamId: { type: "string" },
-                user: { type: "string" },
-                team: { type: "string" },
-                createdAt: { type: "string", format: "date-time" },
-                updatedAt: { type: "string", format: "date-time" },
+                id: { type: 'string' },
+                role: { type: 'string' },
+                userId: { type: 'string' },
+                teamId: { type: 'string' },
+                user: { type: 'string' },
+                team: { type: 'string' },
+                createdAt: { type: 'string', format: 'date-time' },
+                updatedAt: { type: 'string', format: 'date-time' },
               },
-              required: ["userId", "teamId", "user", "team", "updatedAt"],
+              required: ['userId', 'teamId', 'user', 'team', 'updatedAt'],
             },
           },
         },
@@ -89,40 +84,22 @@ export const GET = defineApi(
   },
 );
 export const PUT = defineApi(
-  async (context) => {
+  async (context, actor) => {
     const { id } = context.params;
-    if (!id) return new Response(null, { status: 404 });
-
     const body = await context.request.json();
 
-    // Pre-check
-    await ApiGuard.protect(context, "team-owner", {
-      ...context.params,
-      ...body,
-    });
-
-    // Fetch for Post-check ownership
-    const existing = await TeamMemberService.get(id);
-    if (!existing.success || !existing.data) {
-      return new Response(null, { status: 404 });
-    }
-
-    // Post-check
-    await ApiGuard.protect(
-      context,
-      "team-owner",
-      { ...context.params, ...body },
-      existing.data,
-    );
+    // Security Check
+    await ApiGuard.protect(context, 'team-owner', { ...context.params, ...body });
 
     // Zod Validation
     const schema = z
       .object({
-        role: z.nativeEnum(TeamRole).optional(),
+        role: z.nativeEnum(TeamApiModuleTypes.TeamRole).optional(),
         userId: z.string(),
         teamId: z.string(),
       })
       .partial();
+
     const validated = schema.parse(body);
     const select = {
       id: true,
@@ -144,38 +121,39 @@ export const PUT = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-    const actor = context.locals?.actor || (context as any).user;
 
     const result = await TeamMemberService.update(id, validated, select, actor);
 
     if (!result.success) {
-      return new Response(JSON.stringify({ error: result.error }), {
-        status: 400,
-      });
+      if (
+        result.error?.code === 'NOT_FOUND' ||
+        (typeof result.error === 'string' && result.error.includes('not_found'))
+      ) {
+        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
+      }
+      return new Response(JSON.stringify({ error: result.error }), { status: 400 });
     }
 
-    return { success: true, data: result.data };
+    return new Response(JSON.stringify({ success: true, data: result.data }), { status: 200 });
   },
   {
-    summary: "Update TeamMember",
-    tags: ["TeamMember"],
-    parameters: [
-      { name: "id", in: "path", required: true, schema: { type: "string" } },
-    ],
+    summary: 'Update TeamMember',
+    tags: ['TeamMember'],
+    parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
     requestBody: {
       content: {
-        "application/json": {
+        'application/json': {
           schema: {
-            type: "object",
+            type: 'object',
             properties: {
-              id: { type: "string" },
-              role: { type: "string" },
-              userId: { type: "string" },
-              teamId: { type: "string" },
-              user: { type: "string" },
-              team: { type: "string" },
-              createdAt: { type: "string", format: "date-time" },
-              updatedAt: { type: "string", format: "date-time" },
+              id: { type: 'string' },
+              role: { type: 'string' },
+              userId: { type: 'string' },
+              teamId: { type: 'string' },
+              user: { type: 'string' },
+              team: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+              updatedAt: { type: 'string', format: 'date-time' },
             },
           },
         },
@@ -183,22 +161,22 @@ export const PUT = defineApi(
     },
     responses: {
       200: {
-        description: "OK",
+        description: 'OK',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              type: "object",
+              type: 'object',
               properties: {
-                id: { type: "string" },
-                role: { type: "string" },
-                userId: { type: "string" },
-                teamId: { type: "string" },
-                user: { type: "string" },
-                team: { type: "string" },
-                createdAt: { type: "string", format: "date-time" },
-                updatedAt: { type: "string", format: "date-time" },
+                id: { type: 'string' },
+                role: { type: 'string' },
+                userId: { type: 'string' },
+                teamId: { type: 'string' },
+                user: { type: 'string' },
+                team: { type: 'string' },
+                createdAt: { type: 'string', format: 'date-time' },
+                updatedAt: { type: 'string', format: 'date-time' },
               },
-              required: ["userId", "teamId", "user", "team", "updatedAt"],
+              required: ['userId', 'teamId', 'user', 'team', 'updatedAt'],
             },
           },
         },
@@ -207,52 +185,39 @@ export const PUT = defineApi(
   },
 );
 export const DELETE = defineApi(
-  async (context) => {
+  async (context, actor) => {
     const { id } = context.params;
-    if (!id) return new Response(null, { status: 404 });
 
-    // Pre-check
-    await ApiGuard.protect(context, "team-owner", { ...context.params });
+    // Security Check
+    await ApiGuard.protect(context, 'team-owner', { ...context.params });
 
-    // Fetch for Post-check ownership
-    const existing = await TeamMemberService.get(id);
-    if (!existing.success || !existing.data) {
-      return new Response(null, { status: 404 });
-    }
-
-    // Post-check
-    await ApiGuard.protect(
-      context,
-      "team-owner",
-      { ...context.params },
-      existing.data,
-    );
-
-    const result = await TeamMemberService.delete(id);
+    const result = await TeamMemberService.delete(id, actor);
 
     if (!result.success) {
-      return new Response(JSON.stringify({ error: result.error }), {
-        status: 400,
-      });
+      if (
+        result.error?.code === 'NOT_FOUND' ||
+        (typeof result.error === 'string' && result.error.includes('not_found'))
+      ) {
+        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
+      }
+      return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
 
     return { success: true };
   },
   {
-    summary: "Delete TeamMember",
-    tags: ["TeamMember"],
-    parameters: [
-      { name: "id", in: "path", required: true, schema: { type: "string" } },
-    ],
+    summary: 'Delete TeamMember',
+    tags: ['TeamMember'],
+    parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
     responses: {
       200: {
-        description: "OK",
+        description: 'OK',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              type: "object",
+              type: 'object',
               properties: {
-                success: { type: "boolean" },
+                success: { type: 'boolean' },
               },
             },
           },
