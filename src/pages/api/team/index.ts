@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
+import { HookSystem } from '@/lib/modules/hooks';
 import { parseQuery } from '@/lib/api/api-query';
 
-import { HookSystem } from '@/lib/modules/hooks';
-import { TeamService } from '@modules/team-api/src/services/team-service';
+import { TeamService } from '../../../services/team-service';
 
 export const GET = defineApi(
   async (context, actor) => {

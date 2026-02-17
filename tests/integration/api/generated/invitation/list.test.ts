@@ -14,7 +14,6 @@ describe('Invitation API - List', () => {
   describe('GET /api/invitation', () => {
     const baseData = {
       email: 'email_test',
-      token: 'token_test',
       expires: new Date().toISOString(),
     };
 

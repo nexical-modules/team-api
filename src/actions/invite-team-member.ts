@@ -1,8 +1,15 @@
-// GENERATED CODE - DO NOT MODIFY
+import crypto from 'node:crypto';
 import { db } from '@/lib/core/db';
 import type { InviteTeamMemberDTO, Invitation } from '../sdk/types';
+import { TeamRole } from '../sdk/types';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
+import { roleRegistry } from '@/lib/registries/role-registry';
+import { TeamMemberService } from '../services/team-member-service';
+import { InvitationService } from '../services/invitation-service';
+import { EmailRegistry } from '@/lib/email/email-registry';
+import { sendEmail } from '@/lib/email/email-sender';
+import { config } from '@/lib/core/config';
 
 export class InviteTeamMemberAction {
   static async run(

@@ -3,6 +3,7 @@ import { db } from '@/lib/core/db';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
 import type { AcceptInvitationDTO } from '../sdk/types';
+import { HookSystem } from '@/lib/modules/hooks';
 
 export class AcceptInvitationTeamMemberAction {
   public static async run(

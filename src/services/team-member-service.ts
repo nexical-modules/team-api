@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY
 import { db } from '@/lib/core/db';
-import { Logger } from '@/lib/core/logger';
 import type { ServiceResponse } from '@/types/service';
 import { HookSystem } from '@/lib/modules/hooks';
 import type { TeamMember, Prisma } from '@prisma/client';
 import type { ApiActor } from '@/lib/api/api-docs';
+import { Logger } from '@/lib/core/logger';
 
 /** Service class for TeamMember-related business logic. */
 export class TeamMemberService {
@@ -13,7 +13,24 @@ export class TeamMemberService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<TeamMember[]>> {
     try {
-      const { where, take, skip, orderBy, select } = params || {};
+      let { where, take, skip, orderBy, select } = params || {};
+
+      // Allow hooks to modify the query parameters (e.g. for scoping)
+      // Pass actor context if available
+      const filteredParams = await HookSystem.filter('teamMember.beforeList', {
+        where,
+        take,
+        skip,
+        orderBy,
+        select,
+        actor,
+      });
+      where = filteredParams.where;
+      take = filteredParams.take;
+      skip = filteredParams.skip;
+      orderBy = filteredParams.orderBy;
+      select = filteredParams.select;
+
       const [data, total] = await db.$transaction([
         db.teamMember.findMany({ where, take, skip, orderBy, select }),
         db.teamMember.count({ where }),
@@ -37,7 +54,7 @@ export class TeamMemberService {
       const data = await db.teamMember.findUnique({ where: { id }, select });
       if (!data) return { success: false, error: 'teamMember.service.error.not_found' };
 
-      const filtered = await HookSystem.filter('teamMember.read', data);
+      const filtered = await HookSystem.filter('teamMember.read', data, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
@@ -52,29 +69,27 @@ export class TeamMemberService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<TeamMember>> {
     try {
-      const input = await HookSystem.filter('teamMember.beforeCreate', data);
+      // Pass actor context to hooks for security/authorship validation
+      const input = await HookSystem.filter('teamMember.beforeCreate', data, { actor });
 
       const newItem = await db.$transaction(async (tx) => {
         const created = await tx.teamMember.create({
-          data: input as any,
+          data: input as Prisma.TeamMemberCreateInput,
           select,
         });
         await HookSystem.dispatch('teamMember.created', {
           id: created.id,
-          actorId: 'system',
+          actorId: actor?.id || 'system',
         });
         return created;
       });
 
-      const filtered = await HookSystem.filter('teamMember.read', newItem);
+      const filtered = await HookSystem.filter('teamMember.read', newItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('TeamMember create Error', error);
-      return {
-        success: false,
-        error: 'teamMember.service.error.create_failed',
-      };
+      return { success: false, error: 'teamMember.service.error.create_failed' };
     }
   }
 
@@ -85,30 +100,28 @@ export class TeamMemberService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<TeamMember>> {
     try {
-      const input = await HookSystem.filter('teamMember.beforeUpdate', data);
+      const input = await HookSystem.filter('teamMember.beforeUpdate', data, { actor, id });
 
       const updatedItem = await db.$transaction(async (tx) => {
         const updated = await tx.teamMember.update({
           where: { id },
-          data: input as any,
+          data: input as Prisma.TeamMemberUpdateInput,
           select,
         });
         await HookSystem.dispatch('teamMember.updated', {
           id,
           changes: Object.keys(input),
+          actorId: actor?.id,
         });
         return updated;
       });
 
-      const filtered = await HookSystem.filter('teamMember.read', updatedItem);
+      const filtered = await HookSystem.filter('teamMember.read', updatedItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('TeamMember update Error', error);
-      return {
-        success: false,
-        error: 'teamMember.service.error.update_failed',
-      };
+      return { success: false, error: 'teamMember.service.error.update_failed' };
     }
   }
 
@@ -116,15 +129,12 @@ export class TeamMemberService {
     try {
       await db.$transaction(async (tx) => {
         await tx.teamMember.delete({ where: { id } });
-        await HookSystem.dispatch('teamMember.deleted', { id });
+        await HookSystem.dispatch('teamMember.deleted', { id, actorId: actor?.id });
       });
       return { success: true };
     } catch (error) {
       Logger.error('TeamMember delete Error', error);
-      return {
-        success: false,
-        error: 'teamMember.service.error.delete_failed',
-      };
+      return { success: false, error: 'teamMember.service.error.delete_failed' };
     }
   }
 }

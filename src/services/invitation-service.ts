@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY
 import { db } from '@/lib/core/db';
-import { Logger } from '@/lib/core/logger';
 import type { ServiceResponse } from '@/types/service';
 import { HookSystem } from '@/lib/modules/hooks';
 import type { Invitation, Prisma } from '@prisma/client';
 import type { ApiActor } from '@/lib/api/api-docs';
+import { Logger } from '@/lib/core/logger';
 
 /** Service class for Invitation-related business logic. */
 export class InvitationService {
@@ -13,7 +13,24 @@ export class InvitationService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<Invitation[]>> {
     try {
-      const { where, take, skip, orderBy, select } = params || {};
+      let { where, take, skip, orderBy, select } = params || {};
+
+      // Allow hooks to modify the query parameters (e.g. for scoping)
+      // Pass actor context if available
+      const filteredParams = await HookSystem.filter('invitation.beforeList', {
+        where,
+        take,
+        skip,
+        orderBy,
+        select,
+        actor,
+      });
+      where = filteredParams.where;
+      take = filteredParams.take;
+      skip = filteredParams.skip;
+      orderBy = filteredParams.orderBy;
+      select = filteredParams.select;
+
       const [data, total] = await db.$transaction([
         db.invitation.findMany({ where, take, skip, orderBy, select }),
         db.invitation.count({ where }),
@@ -37,7 +54,7 @@ export class InvitationService {
       const data = await db.invitation.findUnique({ where: { id }, select });
       if (!data) return { success: false, error: 'invitation.service.error.not_found' };
 
-      const filtered = await HookSystem.filter('invitation.read', data);
+      const filtered = await HookSystem.filter('invitation.read', data, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
@@ -52,29 +69,27 @@ export class InvitationService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<Invitation>> {
     try {
-      const input = await HookSystem.filter('invitation.beforeCreate', data);
+      // Pass actor context to hooks for security/authorship validation
+      const input = await HookSystem.filter('invitation.beforeCreate', data, { actor });
 
       const newItem = await db.$transaction(async (tx) => {
         const created = await tx.invitation.create({
-          data: input as any,
+          data: input as Prisma.InvitationCreateInput,
           select,
         });
         await HookSystem.dispatch('invitation.created', {
           id: created.id,
-          actorId: 'system',
+          actorId: actor?.id || 'system',
         });
         return created;
       });
 
-      const filtered = await HookSystem.filter('invitation.read', newItem);
+      const filtered = await HookSystem.filter('invitation.read', newItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('Invitation create Error', error);
-      return {
-        success: false,
-        error: 'invitation.service.error.create_failed',
-      };
+      return { success: false, error: 'invitation.service.error.create_failed' };
     }
   }
 
@@ -85,30 +100,28 @@ export class InvitationService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<Invitation>> {
     try {
-      const input = await HookSystem.filter('invitation.beforeUpdate', data);
+      const input = await HookSystem.filter('invitation.beforeUpdate', data, { actor, id });
 
       const updatedItem = await db.$transaction(async (tx) => {
         const updated = await tx.invitation.update({
           where: { id },
-          data: input as any,
+          data: input as Prisma.InvitationUpdateInput,
           select,
         });
         await HookSystem.dispatch('invitation.updated', {
           id,
           changes: Object.keys(input),
+          actorId: actor?.id,
         });
         return updated;
       });
 
-      const filtered = await HookSystem.filter('invitation.read', updatedItem);
+      const filtered = await HookSystem.filter('invitation.read', updatedItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('Invitation update Error', error);
-      return {
-        success: false,
-        error: 'invitation.service.error.update_failed',
-      };
+      return { success: false, error: 'invitation.service.error.update_failed' };
     }
   }
 
@@ -116,15 +129,12 @@ export class InvitationService {
     try {
       await db.$transaction(async (tx) => {
         await tx.invitation.delete({ where: { id } });
-        await HookSystem.dispatch('invitation.deleted', { id });
+        await HookSystem.dispatch('invitation.deleted', { id, actorId: actor?.id });
       });
       return { success: true };
     } catch (error) {
       Logger.error('Invitation delete Error', error);
-      return {
-        success: false,
-        error: 'invitation.service.error.delete_failed',
-      };
+      return { success: false, error: 'invitation.service.error.delete_failed' };
     }
   }
 }

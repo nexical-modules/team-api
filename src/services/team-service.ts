@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY
 import { db } from '@/lib/core/db';
-import { Logger } from '@/lib/core/logger';
 import type { ServiceResponse } from '@/types/service';
 import { HookSystem } from '@/lib/modules/hooks';
 import type { Team, Prisma } from '@prisma/client';
 import type { ApiActor } from '@/lib/api/api-docs';
+import { Logger } from '@/lib/core/logger';
 
 /** Service class for Team-related business logic. */
 export class TeamService {
@@ -13,7 +13,24 @@ export class TeamService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<Team[]>> {
     try {
-      const { where, take, skip, orderBy, select } = params || {};
+      let { where, take, skip, orderBy, select } = params || {};
+
+      // Allow hooks to modify the query parameters (e.g. for scoping)
+      // Pass actor context if available
+      const filteredParams = await HookSystem.filter('team.beforeList', {
+        where,
+        take,
+        skip,
+        orderBy,
+        select,
+        actor,
+      });
+      where = filteredParams.where;
+      take = filteredParams.take;
+      skip = filteredParams.skip;
+      orderBy = filteredParams.orderBy;
+      select = filteredParams.select;
+
       const [data, total] = await db.$transaction([
         db.team.findMany({ where, take, skip, orderBy, select }),
         db.team.count({ where }),
@@ -37,7 +54,7 @@ export class TeamService {
       const data = await db.team.findUnique({ where: { id }, select });
       if (!data) return { success: false, error: 'team.service.error.not_found' };
 
-      const filtered = await HookSystem.filter('team.read', data);
+      const filtered = await HookSystem.filter('team.read', data, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
@@ -52,18 +69,19 @@ export class TeamService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<Team>> {
     try {
-      const input = await HookSystem.filter('team.beforeCreate', data);
+      // Pass actor context to hooks for security/authorship validation
+      const input = await HookSystem.filter('team.beforeCreate', data, { actor });
 
       const newItem = await db.$transaction(async (tx) => {
-        const created = await tx.team.create({ data: input as any, select });
+        const created = await tx.team.create({ data: input as Prisma.TeamCreateInput, select });
         await HookSystem.dispatch('team.created', {
           id: created.id,
-          actorId: 'system',
+          actorId: actor?.id || 'system',
         });
         return created;
       });
 
-      const filtered = await HookSystem.filter('team.read', newItem);
+      const filtered = await HookSystem.filter('team.read', newItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
@@ -79,22 +97,23 @@ export class TeamService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<Team>> {
     try {
-      const input = await HookSystem.filter('team.beforeUpdate', data);
+      const input = await HookSystem.filter('team.beforeUpdate', data, { actor, id });
 
       const updatedItem = await db.$transaction(async (tx) => {
         const updated = await tx.team.update({
           where: { id },
-          data: input as any,
+          data: input as Prisma.TeamUpdateInput,
           select,
         });
         await HookSystem.dispatch('team.updated', {
           id,
           changes: Object.keys(input),
+          actorId: actor?.id,
         });
         return updated;
       });
 
-      const filtered = await HookSystem.filter('team.read', updatedItem);
+      const filtered = await HookSystem.filter('team.read', updatedItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
@@ -107,7 +126,7 @@ export class TeamService {
     try {
       await db.$transaction(async (tx) => {
         await tx.team.delete({ where: { id } });
-        await HookSystem.dispatch('team.deleted', { id });
+        await HookSystem.dispatch('team.deleted', { id, actorId: actor?.id });
       });
       return { success: true };
     } catch (error) {

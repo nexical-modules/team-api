@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY
 import { db } from '@/lib/core/db';
-import { Logger } from '@/lib/core/logger';
 import type { ServiceResponse } from '@/types/service';
 import { HookSystem } from '@/lib/modules/hooks';
 import type { TeamApiKey, Prisma } from '@prisma/client';
 import type { ApiActor } from '@/lib/api/api-docs';
+import { Logger } from '@/lib/core/logger';
 
 /** Service class for TeamApiKey-related business logic. */
 export class TeamApiKeyService {
@@ -13,7 +13,24 @@ export class TeamApiKeyService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<TeamApiKey[]>> {
     try {
-      const { where, take, skip, orderBy, select } = params || {};
+      let { where, take, skip, orderBy, select } = params || {};
+
+      // Allow hooks to modify the query parameters (e.g. for scoping)
+      // Pass actor context if available
+      const filteredParams = await HookSystem.filter('teamApiKey.beforeList', {
+        where,
+        take,
+        skip,
+        orderBy,
+        select,
+        actor,
+      });
+      where = filteredParams.where;
+      take = filteredParams.take;
+      skip = filteredParams.skip;
+      orderBy = filteredParams.orderBy;
+      select = filteredParams.select;
+
       const [data, total] = await db.$transaction([
         db.teamApiKey.findMany({ where, take, skip, orderBy, select }),
         db.teamApiKey.count({ where }),
@@ -37,7 +54,7 @@ export class TeamApiKeyService {
       const data = await db.teamApiKey.findUnique({ where: { id }, select });
       if (!data) return { success: false, error: 'teamApiKey.service.error.not_found' };
 
-      const filtered = await HookSystem.filter('teamApiKey.read', data);
+      const filtered = await HookSystem.filter('teamApiKey.read', data, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
@@ -52,29 +69,27 @@ export class TeamApiKeyService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<TeamApiKey>> {
     try {
-      const input = await HookSystem.filter('teamApiKey.beforeCreate', data);
+      // Pass actor context to hooks for security/authorship validation
+      const input = await HookSystem.filter('teamApiKey.beforeCreate', data, { actor });
 
       const newItem = await db.$transaction(async (tx) => {
         const created = await tx.teamApiKey.create({
-          data: input as any,
+          data: input as Prisma.TeamApiKeyCreateInput,
           select,
         });
         await HookSystem.dispatch('teamApiKey.created', {
           id: created.id,
-          actorId: 'system',
+          actorId: actor?.id || 'system',
         });
         return created;
       });
 
-      const filtered = await HookSystem.filter('teamApiKey.read', newItem);
+      const filtered = await HookSystem.filter('teamApiKey.read', newItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('TeamApiKey create Error', error);
-      return {
-        success: false,
-        error: 'teamApiKey.service.error.create_failed',
-      };
+      return { success: false, error: 'teamApiKey.service.error.create_failed' };
     }
   }
 
@@ -85,30 +100,28 @@ export class TeamApiKeyService {
     actor?: ApiActor,
   ): Promise<ServiceResponse<TeamApiKey>> {
     try {
-      const input = await HookSystem.filter('teamApiKey.beforeUpdate', data);
+      const input = await HookSystem.filter('teamApiKey.beforeUpdate', data, { actor, id });
 
       const updatedItem = await db.$transaction(async (tx) => {
         const updated = await tx.teamApiKey.update({
           where: { id },
-          data: input as any,
+          data: input as Prisma.TeamApiKeyUpdateInput,
           select,
         });
         await HookSystem.dispatch('teamApiKey.updated', {
           id,
           changes: Object.keys(input),
+          actorId: actor?.id,
         });
         return updated;
       });
 
-      const filtered = await HookSystem.filter('teamApiKey.read', updatedItem);
+      const filtered = await HookSystem.filter('teamApiKey.read', updatedItem, { actor });
 
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('TeamApiKey update Error', error);
-      return {
-        success: false,
-        error: 'teamApiKey.service.error.update_failed',
-      };
+      return { success: false, error: 'teamApiKey.service.error.update_failed' };
     }
   }
 
@@ -116,15 +129,12 @@ export class TeamApiKeyService {
     try {
       await db.$transaction(async (tx) => {
         await tx.teamApiKey.delete({ where: { id } });
-        await HookSystem.dispatch('teamApiKey.deleted', { id });
+        await HookSystem.dispatch('teamApiKey.deleted', { id, actorId: actor?.id });
       });
       return { success: true };
     } catch (error) {
       Logger.error('TeamApiKey delete Error', error);
-      return {
-        success: false,
-        error: 'teamApiKey.service.error.delete_failed',
-      };
+      return { success: false, error: 'teamApiKey.service.error.delete_failed' };
     }
   }
 }

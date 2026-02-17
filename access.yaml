@@ -1,0 +1,31 @@
+config:
+  roles:
+    OWNER:
+      permissions:
+        - team:update
+        - team:delete
+        - team:manage_keys
+        - team:manage_members
+        - team:invite
+        - team:read_self
+    ADMIN:
+      permissions:
+        - team:update
+        - team:invite
+        - team:read_self
+    MEMBER:
+      permissions:
+        - team:read_self
+  permissions:
+    team:update:
+      description: Update team details
+    team:delete:
+      description: Delete the team
+    team:manage_keys:
+      description: Create and delete API keys
+    team:manage_members:
+      description: Update or remove team members
+    team:invite:
+      description: Invite new members
+    team:read_self:
+      description: View team details

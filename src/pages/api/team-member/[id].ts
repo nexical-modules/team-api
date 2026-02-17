@@ -3,7 +3,7 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { z } from 'zod';
 import { TeamMemberService } from '@modules/team-api/src/services/team-member-service';
-import type { TeamApiModuleTypes } from '@/lib/api';
+import * as TeamApiModuleTypes from '../../../sdk/types';
 
 export const GET = defineApi(
   async (context, actor) => {

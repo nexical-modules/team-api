@@ -33,15 +33,15 @@ export const factories = {
       team: {
         create: Factory.getBuilder('team')(index),
       },
+      role: 'MEMBER',
     };
   },
   invitation: (index: number) => {
     return {
       email: `${index}_${crypto.randomUUID()}@example.com`.toLowerCase(),
-      teamId: `teamId_${index}`,
-      inviterId: `inviterId_${index}`,
       token: `token_${index}_${crypto.randomUUID().split('-')[0]}`,
       expires: new Date(),
+      teamRole: 'MEMBER',
     };
   },
   user: (index: number) => {
@@ -51,6 +51,7 @@ export const factories = {
       email: `${index}_${crypto.randomUUID()}@example.com`.toLowerCase(),
       username: `username_${index}_${crypto.randomUUID().split('-')[0]}`,
       image: `image_${index}`,
+      role: 'EMPLOYEE',
       password: hashPassword('Password123!'),
     };
   },
