@@ -5,6 +5,7 @@
 
 import type { CreateTeamApiKeyDTO, TeamApiKey } from '../sdk/types'; // Generated types
 import type { APIContext } from 'astro';
+import type { ServiceResponse } from '@/types/service';
 
 export class CreateTeamApiKeyAction {
   static async run(
@@ -12,7 +13,7 @@ export class CreateTeamApiKeyAction {
     context: APIContext,
   ): Promise<ServiceResponse<TeamApiKey>> {
     const { teamId, name, expiresAt } = input;
-    const userId = (context.locals.actor as any)?.id; // Assuming actor is populated
+    const userId = (context.locals.actor as { id: string } | undefined)?.id; // Assuming actor is populated
 
     if (!userId) return { success: false, error: 'Unauthorized' };
 
@@ -46,8 +47,9 @@ export class CreateTeamApiKeyAction {
           rawKey, // Return raw key only once
         },
       };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { success: false, error: message };
     }
   }
 }
