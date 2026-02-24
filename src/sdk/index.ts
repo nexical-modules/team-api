@@ -5,11 +5,6 @@ import { TeamApiKeySDK as BaseTeamApiKeySDK } from './team-api-key-sdk.js';
 import { TeamMemberSDK as BaseTeamMemberSDK } from './team-member-sdk.js';
 import { InvitationSDK as BaseInvitationSDK } from './invitation-sdk.js';
 
-export * from './team-sdk';
-export * from './team-api-key-sdk';
-export * from './team-member-sdk';
-export * from './types';
-export * from './invitation-sdk';
 export * from './team-sdk.js';
 export * from './team-api-key-sdk.js';
 export * from './team-member-sdk.js';
