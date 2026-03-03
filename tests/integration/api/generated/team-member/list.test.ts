@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('TeamMember API - List', () => {
   let client: ApiClient;
 
@@ -14,22 +14,16 @@ describe('TeamMember API - List', () => {
   describe('GET /api/team-member', () => {
     const baseData = {};
 
-    it('should allow team-member to list teamMembers', async () => {
-      const actor = await client.as('team', { name: 'Member Team' });
+    it('should allow TEAM_OWNER to list teamMembers', async () => {
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       // Cleanup first to ensure clean state
       await Factory.prisma.teamMember.deleteMany();
 
       // Seed data
       const _listSuffix = Date.now();
-      await Factory.create('teamMember', {
-        ...baseData,
-        team: { connect: { id: actor.id } },
-      });
-      await Factory.create('teamMember', {
-        ...baseData,
-        team: { connect: { id: actor.id } },
-      });
+      await Factory.create('teamMember', { ...baseData, team: { connect: { id: actor.id } } });
+      await Factory.create('teamMember', { ...baseData, team: { connect: { id: actor.id } } });
 
       const res = await client.get('/api/team-member');
 
@@ -40,7 +34,7 @@ describe('TeamMember API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      const actor = await client.as('team', { name: 'Member Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       // Cleanup and seed specific count
       await Factory.prisma.teamMember.deleteMany();

@@ -3,7 +3,7 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
 import { CreateTeamAction } from '@modules/team-api/src/actions/create-team';
-import * as TeamApiModuleTypes from '../../../sdk/types';
+import type { TeamApiModuleTypes } from '@/lib/api';
 
 export const POST = defineApi(
   async (context, actor) => {
@@ -20,7 +20,7 @@ export const POST = defineApi(
 
     // 3. Security Check
     const combinedInput = { ...context.params, ...query, ...input };
-    await ApiGuard.protect(context, 'employee', combinedInput);
+    await ApiGuard.protect(context, 'TEAM_MEMBER', combinedInput);
 
     // Inject userId from context for protected routes
     if (actor && actor.id) {
@@ -38,7 +38,7 @@ export const POST = defineApi(
       return new Response(JSON.stringify({ error: filteredResult.error }), { status: 400 });
     }
 
-    return new Response(JSON.stringify(filteredResult.data), { status: 200 });
+    return { success: true, data: filteredResult.data };
   },
   {
     summary: 'Create a new team',

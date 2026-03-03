@@ -5,7 +5,7 @@ Team:
     summary: Create a new team
     input: CreateTeamDTO
     output: Team
-    role: member
+    role: TEAM_MEMBER
     action: create-team
 
 TeamMember:
@@ -15,7 +15,7 @@ TeamMember:
     summary: List team invitations
     input: ListInvitationsDTO
     output: Invitation[]
-    role: member
+    role: TEAM_MEMBER
 
   - path: /invitations
     verb: POST
@@ -23,7 +23,7 @@ TeamMember:
     summary: Invite a new team member
     input: InviteTeamMemberDTO
     output: Invitation
-    role: team-admin
+    role: TEAM_ADMIN
     action: invite-team-member
 
   - path: /invitations/[id]/resend
@@ -32,7 +32,7 @@ TeamMember:
     summary: Resend invitation email
     input: ResendInvitationDTO
     output: none
-    role: team-admin
+    role: TEAM_ADMIN
 
   - path: /invitations/accept
     verb: POST
@@ -40,7 +40,7 @@ TeamMember:
     summary: Accept an invitation
     input: AcceptInvitationDTO
     output: none
-    role: member
+    role: TEAM_MEMBER
 
   - path: /invitations/[id]
     verb: DELETE
@@ -48,7 +48,7 @@ TeamMember:
     summary: Cancel/Delete an invitation
     input: none
     output: none
-    role: team-admin
+    role: TEAM_ADMIN
 
 TeamApiKey:
   - path: /keys
@@ -57,5 +57,5 @@ TeamApiKey:
     summary: Create a new API Key (returns raw key)
     input: CreateTeamApiKeyDTO
     output: TeamApiKey
-    role: team-owner
+    role: TEAM_OWNER
     action: create-team-api-key

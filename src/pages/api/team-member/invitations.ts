@@ -21,7 +21,7 @@ export const GET = defineApi(
 
     // 3. Security Check
     const combinedInput = { ...context.params, ...query, ...input };
-    await ApiGuard.protect(context, 'member', combinedInput);
+    await ApiGuard.protect(context, 'TEAM_MEMBER', combinedInput);
 
     // Inject userId from context for protected routes
     if (actor && actor.id) {
@@ -91,7 +91,7 @@ export const POST = defineApi(
 
     // 3. Security Check
     const combinedInput = { ...context.params, ...query, ...input };
-    await ApiGuard.protect(context, 'team-admin', combinedInput);
+    await ApiGuard.protect(context, 'TEAM_ADMIN', combinedInput);
 
     // Inject userId from context for protected routes
     if (actor && actor.id) {

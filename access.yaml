@@ -1,6 +1,6 @@
 config:
   roles:
-    OWNER:
+    TEAM_OWNER:
       permissions:
         - team:update
         - team:delete
@@ -8,12 +8,12 @@ config:
         - team:manage_members
         - team:invite
         - team:read_self
-    ADMIN:
+    TEAM_ADMIN:
       permissions:
         - team:update
         - team:invite
         - team:read_self
-    MEMBER:
+    TEAM_MEMBER:
       permissions:
         - team:read_self
   permissions:

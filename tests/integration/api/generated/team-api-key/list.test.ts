@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('TeamApiKey API - List', () => {
   let client: ApiClient;
 
@@ -12,19 +12,13 @@ describe('TeamApiKey API - List', () => {
 
   // GET /api/team-api-key
   describe('GET /api/team-api-key', () => {
-    const baseData = {
-      name: 'name_test',
-      hashedKey: 'hashedKey_test',
-      prefix: 'prefix_test',
-    };
+    const baseData = { name: 'name_test', hashedKey: 'hashedKey_test', prefix: 'prefix_test' };
 
-    it('should allow team-owner to list teamApiKeys', async () => {
-      const actor = await client.as('team', { name: 'Owner Team' });
+    it('should allow TEAM_OWNER to list teamApiKeys', async () => {
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       // Cleanup first to ensure clean state
-      await Factory.prisma.teamApiKey.deleteMany({
-        where: { teamId: { not: actor.id } },
-      });
+      await Factory.prisma.teamApiKey.deleteMany({ where: { teamId: { not: actor.id } } });
 
       // Seed data
       const _listSuffix = Date.now();
@@ -48,12 +42,10 @@ describe('TeamApiKey API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       // Cleanup and seed specific count
-      await Factory.prisma.teamApiKey.deleteMany({
-        where: { teamId: { not: actor.id } },
-      });
+      await Factory.prisma.teamApiKey.deleteMany({ where: { teamId: { not: actor.id } } });
 
       const _suffix = Date.now();
       const createdIds: string[] = [];
@@ -63,9 +55,7 @@ describe('TeamApiKey API - List', () => {
 
       const _listSuffix = Date.now();
       let currentCount = 0;
-      currentCount = await Factory.prisma.teamApiKey.count({
-        where: { teamId: actor.id },
-      });
+      currentCount = await Factory.prisma.teamApiKey.count({ where: { teamId: actor.id } });
       const toCreate = totalTarget - currentCount;
 
       for (let i = 0; i < toCreate; i++) {
@@ -94,30 +84,16 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
       // Reuse getActorStatement to ensure correct actor context
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       const val1 = 'name_' + Date.now() + '_A';
       const val2 = 'name_' + Date.now() + '_B';
 
-      const data1 = {
-        ...baseData,
-        name: val1,
-        hashedKey: 'filter_a_' + Date.now() + '',
-      };
-      const data2 = {
-        ...baseData,
-        name: val2,
-        hashedKey: 'filter_b_' + Date.now() + '',
-      };
+      const data1 = { ...baseData, name: val1, hashedKey: 'filter_a_' + Date.now() + '' };
+      const data2 = { ...baseData, name: val2, hashedKey: 'filter_b_' + Date.now() + '' };
 
-      await Factory.create('teamApiKey', {
-        ...data1,
-        team: { connect: { id: actor.id } },
-      });
-      await Factory.create('teamApiKey', {
-        ...data2,
-        team: { connect: { id: actor.id } },
-      });
+      await Factory.create('teamApiKey', { ...data1, team: { connect: { id: actor.id } } });
+      await Factory.create('teamApiKey', { ...data2, team: { connect: { id: actor.id } } });
 
       const res = await client.get('/api/team-api-key?name=' + val1);
       expect(res.status).toBe(200);
@@ -129,7 +105,7 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
       // Reuse getActorStatement to ensure correct actor context
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       const val1 = 'hashedKey_' + Date.now() + '_A';
       const val2 = 'hashedKey_' + Date.now() + '_B';
@@ -137,14 +113,8 @@ describe('TeamApiKey API - List', () => {
       const data1 = { ...baseData, hashedKey: val1 };
       const data2 = { ...baseData, hashedKey: val2 };
 
-      await Factory.create('teamApiKey', {
-        ...data1,
-        team: { connect: { id: actor.id } },
-      });
-      await Factory.create('teamApiKey', {
-        ...data2,
-        team: { connect: { id: actor.id } },
-      });
+      await Factory.create('teamApiKey', { ...data1, team: { connect: { id: actor.id } } });
+      await Factory.create('teamApiKey', { ...data2, team: { connect: { id: actor.id } } });
 
       const res = await client.get('/api/team-api-key?hashedKey=' + val1);
       expect(res.status).toBe(200);
@@ -156,30 +126,16 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
       // Reuse getActorStatement to ensure correct actor context
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       const val1 = 'prefix_' + Date.now() + '_A';
       const val2 = 'prefix_' + Date.now() + '_B';
 
-      const data1 = {
-        ...baseData,
-        prefix: val1,
-        hashedKey: 'filter_a_' + Date.now() + '',
-      };
-      const data2 = {
-        ...baseData,
-        prefix: val2,
-        hashedKey: 'filter_b_' + Date.now() + '',
-      };
+      const data1 = { ...baseData, prefix: val1, hashedKey: 'filter_a_' + Date.now() + '' };
+      const data2 = { ...baseData, prefix: val2, hashedKey: 'filter_b_' + Date.now() + '' };
 
-      await Factory.create('teamApiKey', {
-        ...data1,
-        team: { connect: { id: actor.id } },
-      });
-      await Factory.create('teamApiKey', {
-        ...data2,
-        team: { connect: { id: actor.id } },
-      });
+      await Factory.create('teamApiKey', { ...data1, team: { connect: { id: actor.id } } });
+      await Factory.create('teamApiKey', { ...data2, team: { connect: { id: actor.id } } });
 
       const res = await client.get('/api/team-api-key?prefix=' + val1);
       expect(res.status).toBe(200);

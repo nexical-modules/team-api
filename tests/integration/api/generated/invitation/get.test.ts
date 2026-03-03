@@ -1,9 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
-
+import { Factory } from '@tests/integration/lib/factory';
 describe('Invitation API - Get', () => {
   let client: ApiClient;
 
@@ -14,15 +13,11 @@ describe('Invitation API - Get', () => {
   // GET /api/invitation/[id]
   describe('GET /api/invitation/[id]', () => {
     it('should retrieve a specific invitation', async () => {
-      const actor = await client.as('user', {});
+      const actor = await client.as('team', {});
 
       const target = await Factory.create('invitation', {
-        ...{
-          email: 'email_test',
-          token: 'token_test',
-          expires: new Date().toISOString(),
-        },
-        inviter: { connect: { id: actor.id } },
+        ...{ email: 'email_test', token: 'token_test', expires: new Date().toISOString() },
+        team: { connect: { id: actor.id } },
       });
 
       const res = await client.get(`/api/invitation/${target.id}`);
@@ -33,7 +28,7 @@ describe('Invitation API - Get', () => {
 
     it('should return 404 for missing id', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', {});
+      const actor = await client.as('team', {});
       const res = await client.get('/api/invitation/missing-id-123');
       expect(res.status).toBe(404);
     });

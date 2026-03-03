@@ -3,14 +3,14 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { z } from 'zod';
 import { TeamMemberService } from '@modules/team-api/src/services/team-member-service';
-import * as TeamApiModuleTypes from '../../../sdk/types';
+import { TeamModuleTypes } from '@/lib/api';
 
 export const GET = defineApi(
   async (context, actor) => {
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'team-member', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
 
     const select = {
       id: true,
@@ -89,12 +89,12 @@ export const PUT = defineApi(
     const body = await context.request.json();
 
     // Security Check
-    await ApiGuard.protect(context, 'team-owner', { ...context.params, ...body });
+    await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params, ...body });
 
     // Zod Validation
     const schema = z
       .object({
-        role: z.nativeEnum(TeamApiModuleTypes.TeamRole).optional(),
+        role: z.nativeEnum(TeamModuleTypes.TeamRole).optional(),
         userId: z.string(),
         teamId: z.string(),
       })
@@ -189,7 +189,7 @@ export const DELETE = defineApi(
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'team-owner', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
 
     const result = await TeamMemberService.delete(id, actor);
 

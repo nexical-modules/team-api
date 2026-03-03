@@ -20,10 +20,10 @@ describe('Team Action - Create', () => {
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.name).toBe(teamName);
+    expect(res.body.data.name).toBe(teamName);
 
     // Verify side effects in DB
-    const teamId = res.body.id;
+    const teamId = res.body.data.id;
     const membership = await db.teamMember.findFirst({
       where: {
         teamId,
@@ -32,7 +32,7 @@ describe('Team Action - Create', () => {
     });
 
     expect(membership).toBeDefined();
-    expect(membership?.role).toBe('OWNER');
+    expect(membership?.role).toBe('TEAM_OWNER');
   });
 
   it('should return 400 when team name is missing', async () => {

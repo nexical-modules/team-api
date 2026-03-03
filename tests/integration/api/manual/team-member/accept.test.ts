@@ -25,7 +25,7 @@ describe('TeamMember Action - Accept Invitation', () => {
         teamId: team.id,
         inviterId: inviter.id,
         token: token,
-        teamRole: 'MEMBER',
+        teamRole: 'TEAM_MEMBER',
         expires: new Date(Date.now() + 1000 * 60 * 60), // 1 hour
       },
     });
@@ -47,7 +47,7 @@ describe('TeamMember Action - Accept Invitation', () => {
       },
     });
     expect(membership).toBeDefined();
-    expect(membership?.role).toBe('MEMBER');
+    expect(membership?.role).toBe('TEAM_MEMBER');
 
     // Verify invitation is deleted
     const invite = await db.invitation.findUnique({
@@ -77,7 +77,7 @@ describe('TeamMember Action - Accept Invitation', () => {
         teamId: team.id,
         inviterId: inviter.id,
         token: token,
-        teamRole: 'MEMBER',
+        teamRole: 'TEAM_MEMBER',
         expires: new Date(Date.now() + 1000 * 60 * 60),
       },
     });

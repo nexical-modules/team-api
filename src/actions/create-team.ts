@@ -1,10 +1,10 @@
-// GENERATED CODE - DO NOT MODIFY
+// GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
 import { db } from '@/lib/core/db';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
-import { TeamRole } from '../sdk/types';
+import type { CreateTeamDTO, Team, TeamRole } from '../sdk/types';
 import { HookSystem } from '@/lib/modules/hooks';
-import type { CreateTeamDTO, Team } from '../sdk/types';
+import type { ApiActor } from '@/lib/api/api-docs';
 
 export class CreateTeamAction {
   public static async run(
@@ -12,14 +12,14 @@ export class CreateTeamAction {
     context: APIContext,
   ): Promise<ServiceResponse<Team>> {
     const { name } = input;
-    const userId = (context.locals.actor as any)?.id || (context as any).user?.id;
+    const userId = (context.locals.actor as ApiActor)?.id;
 
     if (!userId) return { success: false, error: 'Unauthorized' };
 
     try {
       // 1. Enforce Limit
       const teamCount = await db.teamMember.count({
-        where: { userId: userId, role: TeamRole.OWNER },
+        where: { userId: userId, role: TeamRole.TEAM_OWNER },
       });
 
       if (teamCount >= 10) {
@@ -32,7 +32,7 @@ export class CreateTeamAction {
           data: {
             name,
             members: {
-              create: { userId: userId, role: TeamRole.OWNER },
+              create: { userId: userId, role: 'TEAM_OWNER' as TeamRole },
             },
           },
         });
@@ -47,7 +47,7 @@ export class CreateTeamAction {
       });
 
       return { success: true, data: team };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       return { success: false, error: 'team.service.error.create_failed' };
     }

@@ -1,9 +1,10 @@
-// GENERATED CODE - DO NOT MODIFY
+// GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
 import type { ListInvitationsDTO, Invitation } from '../sdk/types';
 
 import { db } from '@/lib/core/db';
+import type { ApiActor } from '@/lib/api/api-docs';
 
 export class ListInvitationsTeamMemberAction {
   public static async run(
@@ -25,7 +26,7 @@ export class ListInvitationsTeamMemberAction {
       });
 
       // Map to Invitation type if needed, or cast
-      return { success: true, data: invitations as any[] };
+      return { success: true, data: invitations as ApiActor[] };
     } catch (error) {
       console.error('List Invitations Error', error);
       return { success: false, error: 'team.invitation.error.list_failed' };

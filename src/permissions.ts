@@ -25,7 +25,7 @@ export const PermissionRegistry = {
 export type PermissionAction = keyof typeof PermissionRegistry;
 
 export const RolePermissions = {
-  OWNER: [
+  TEAM_OWNER: [
     'team:update',
     'team:delete',
     'team:manage_keys',
@@ -33,8 +33,8 @@ export const RolePermissions = {
     'team:invite',
     'team:read_self',
   ],
-  ADMIN: ['team:update', 'team:invite', 'team:read_self'],
-  MEMBER: ['team:read_self'],
+  TEAM_ADMIN: ['team:update', 'team:invite', 'team:read_self'],
+  TEAM_MEMBER: ['team:read_self'],
 } as const;
 
 export class Permission {

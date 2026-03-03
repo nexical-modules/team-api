@@ -17,7 +17,11 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
     const entity = tokenEntity?.team;
 
     if (entity) {
-      context.locals.actor = { ...entity, type: 'team', role: 'TEAM' };
+      context.locals.actor = {
+        ...entity,
+        type: 'team',
+        role: entity && 'role' in entity ? (entity as { role: string }).role : 'TEAM',
+      };
       context.locals.actorType = 'team';
       return next();
     }

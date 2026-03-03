@@ -46,6 +46,6 @@ export class TeamSDK extends BaseResource {
   public async createTeam(
     data: CreateTeamDTO,
   ): Promise<{ success: boolean; data: Team; error?: string }> {
-    return this._request('POST', `/team/create`, data);
+    return this._request('POST', `${endpoint ? '/' + endpoint : ''}/create`, data);
   }
 }

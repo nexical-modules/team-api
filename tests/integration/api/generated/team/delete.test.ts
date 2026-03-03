@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('Team API - Delete', () => {
   let client: ApiClient;
 
@@ -13,7 +13,7 @@ describe('Team API - Delete', () => {
   // DELETE /api/team/[id]
   describe('DELETE /api/team/[id]', () => {
     it('should delete team', async () => {
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       const target = actor;
 
@@ -21,9 +21,7 @@ describe('Team API - Delete', () => {
 
       expect(res.status).toBe(200);
 
-      const check = await Factory.prisma.team.findUnique({
-        where: { id: target.id },
-      });
+      const check = await Factory.prisma.team.findUnique({ where: { id: target.id } });
       expect(check).toBeNull();
     });
   });

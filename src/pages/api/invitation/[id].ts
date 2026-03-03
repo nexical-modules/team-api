@@ -3,7 +3,7 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { z } from 'zod';
 import { InvitationService } from '@modules/team-api/src/services/invitation-service';
-import * as TeamApiModuleTypes from '../../../sdk/types';
+import { TeamModuleTypes } from '@/lib/api';
 
 export const GET = defineApi(
   async (context, actor) => {
@@ -101,7 +101,7 @@ export const PUT = defineApi(
     const schema = z
       .object({
         email: z.string(),
-        teamRole: z.nativeEnum(TeamApiModuleTypes.TeamRole).optional(),
+        teamRole: z.nativeEnum(TeamModuleTypes.TeamRole).optional(),
         teamId: z.string().optional(),
         inviterId: z.string().optional(),
         token: z.string(),
@@ -207,7 +207,7 @@ export const DELETE = defineApi(
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'team-admin', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params });
 
     const result = await InvitationService.delete(id, actor);
 

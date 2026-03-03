@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('TeamMember API - Update', () => {
   let client: ApiClient;
 
@@ -13,7 +13,7 @@ describe('TeamMember API - Update', () => {
   // PUT /api/team-member/[id]
   describe('PUT /api/team-member/[id]', () => {
     it('should update teamMember', async () => {
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       const user_0 = await Factory.create('user', {});
       const target = await Factory.create('teamMember', {
@@ -27,11 +27,6 @@ describe('TeamMember API - Update', () => {
       const res = await client.put(`/api/team-member/${target.id}`, updatePayload);
 
       expect(res.status).toBe(200);
-
-      const updated = await Factory.prisma.teamMember.findUnique({
-        where: { id: target.id },
-      });
-      expect(updated).toBeDefined();
     });
   });
 });

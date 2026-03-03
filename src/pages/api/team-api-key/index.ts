@@ -5,7 +5,6 @@ import { parseQuery } from '@/lib/api/api-query';
 
 import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
 import { HookSystem } from '@/lib/modules/hooks';
-
 export const GET = defineApi(
   async (context, actor) => {
     const filterOptions = {
@@ -28,7 +27,7 @@ export const GET = defineApi(
 
     // Security Check
     // Pass query params as input to role check
-    await ApiGuard.protect(context, 'team-owner', {
+    await ApiGuard.protect(context, 'TEAM_OWNER', {
       ...context.params,
       where,
       take,

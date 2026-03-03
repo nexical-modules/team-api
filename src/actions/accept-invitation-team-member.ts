@@ -1,9 +1,10 @@
-// GENERATED CODE - DO NOT MODIFY
+// GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
 import { db } from '@/lib/core/db';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
 import type { AcceptInvitationDTO } from '../sdk/types';
 import { HookSystem } from '@/lib/modules/hooks';
+import type { ApiActor } from '@/lib/api/api-docs';
 
 export class AcceptInvitationTeamMemberAction {
   public static async run(
@@ -11,7 +12,7 @@ export class AcceptInvitationTeamMemberAction {
     context: APIContext,
   ): Promise<ServiceResponse<void>> {
     const { token } = input;
-    const user = (context.locals.actor as any) || (context as any).user;
+    const user = (context.locals.actor as ApiActor) || (context as ApiActor).user;
 
     if (!user) return { success: false, error: 'Unauthorized' };
 
@@ -61,7 +62,7 @@ export class AcceptInvitationTeamMemberAction {
       });
 
       return { success: true, data: result };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       return { success: false, error: 'invitation.error.accept_failed' };
     }

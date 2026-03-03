@@ -4,7 +4,6 @@ import { ApiGuard } from '@/lib/api/api-guard';
 import { parseQuery } from '@/lib/api/api-query';
 import { HookSystem } from '@/lib/modules/hooks';
 import { InvitationService } from '@modules/team-api/src/services/invitation-service';
-
 export const GET = defineApi(
   async (context, actor) => {
     const filterOptions = {
@@ -29,7 +28,7 @@ export const GET = defineApi(
 
     // Security Check
     // Pass query params as input to role check
-    await ApiGuard.protect(context, 'team-admin', {
+    await ApiGuard.protect(context, 'TEAM_ADMIN', {
       ...context.params,
       where,
       take,

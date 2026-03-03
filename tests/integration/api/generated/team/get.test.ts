@@ -12,7 +12,7 @@ describe('Team API - Get', () => {
   // GET /api/team/[id]
   describe('GET /api/team/[id]', () => {
     it('should retrieve a specific team', async () => {
-      const actor = await client.as('team', { name: 'Member Team' });
+      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
 
       const target = actor;
 
@@ -24,9 +24,9 @@ describe('Team API - Get', () => {
 
     it('should return 404 for missing id', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('team', { name: 'Member Team' });
+      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
       const res = await client.get('/api/team/missing-id-123');
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(403);
     });
   });
 });

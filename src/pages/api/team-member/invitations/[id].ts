@@ -7,19 +7,16 @@ import { DeleteInvitationTeamMemberAction } from '@modules/team-api/src/actions/
 export const DELETE = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)
-    const body = (await context.request.json()) as TeamApiModuleTypes.none;
+    const body = (await context.request.json()) as unknown;
 
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
 
     // 2. Hook: Filter Input
-    const input: TeamApiModuleTypes.none = await HookSystem.filter(
-      'teamMember.deleteInvitation.input',
-      body,
-    );
+    const input: unknown = await HookSystem.filter('teamMember.deleteInvitation.input', body);
 
     // 3. Security Check
     const combinedInput = { ...context.params, ...query, ...input };
-    await ApiGuard.protect(context, 'team-admin', combinedInput);
+    await ApiGuard.protect(context, 'TEAM_ADMIN', combinedInput);
 
     // Inject userId from context for protected routes
     if (actor && actor.id) {

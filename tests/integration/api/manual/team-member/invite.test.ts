@@ -17,14 +17,14 @@ describe('TeamMember Action - Invite', () => {
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },
       team: { connect: { id: team.id } },
-      role: 'OWNER',
+      role: 'TEAM_OWNER',
     });
 
     const inviteEmail = `new_user_${Date.now()}@example.com`;
     const res = await client.post('/api/team-member/invitations', {
       teamId: team.id,
       email: inviteEmail,
-      role: 'MEMBER',
+      role: 'TEAM_MEMBER',
     });
 
     expect(res.status).toBe(200);
@@ -46,7 +46,7 @@ describe('TeamMember Action - Invite', () => {
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },
       team: { connect: { id: team.id } },
-      role: 'OWNER',
+      role: 'TEAM_OWNER',
     });
 
     const otherUser = await Factory.create('user');
@@ -54,7 +54,7 @@ describe('TeamMember Action - Invite', () => {
     const res = await client.post('/api/team-member/invitations', {
       teamId: team.id,
       email: otherUser.email,
-      role: 'ADMIN',
+      role: 'TEAM_ADMIN',
     });
 
     expect(res.status).toBe(200);
@@ -67,7 +67,7 @@ describe('TeamMember Action - Invite', () => {
       },
     });
     expect(membership).toBeDefined();
-    expect(membership?.role).toBe('ADMIN');
+    expect(membership?.role).toBe('TEAM_ADMIN');
 
     // Verify NO invitation in DB
     const invite = await db.invitation.findFirst({
@@ -82,7 +82,7 @@ describe('TeamMember Action - Invite', () => {
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },
       team: { connect: { id: team.id } },
-      role: 'OWNER',
+      role: 'TEAM_OWNER',
     });
 
     const res = await client.post('/api/team-member/invitations', {
@@ -101,14 +101,14 @@ describe('TeamMember Action - Invite', () => {
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },
       team: { connect: { id: team.id } },
-      role: 'OWNER',
+      role: 'TEAM_OWNER',
     });
 
     const member = await Factory.create('user');
     await Factory.create('teamMember', {
       team: { connect: { id: team.id } },
       user: { connect: { id: member.id } },
-      role: 'MEMBER',
+      role: 'TEAM_MEMBER',
     });
 
     // Use member session

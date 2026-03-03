@@ -38,7 +38,7 @@ export interface ListInvitationsDTO {
 export type { Team, TeamApiKey, TeamMember, Invitation, User } from '@prisma/client';
 
 export enum TeamRole {
-  OWNER = 'OWNER',
-  ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER',
+  TEAM_OWNER = 'TEAM_OWNER',
+  TEAM_ADMIN = 'TEAM_ADMIN',
+  TEAM_MEMBER = 'TEAM_MEMBER',
 }

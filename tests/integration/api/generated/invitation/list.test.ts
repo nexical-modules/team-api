@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('Invitation API - List', () => {
   let client: ApiClient;
 
@@ -14,11 +14,12 @@ describe('Invitation API - List', () => {
   describe('GET /api/invitation', () => {
     const baseData = {
       email: 'email_test',
+      token: 'token_test',
       expires: new Date().toISOString(),
     };
 
-    it('should allow team-admin to list invitations', async () => {
-      const actor = await client.as('user', { name: 'Admin Team' });
+    it('should allow TEAM_ADMIN to list invitations', async () => {
+      const actor = await client.as('team', { role: 'TEAM_ADMIN', name: 'Admin Team' });
 
       // Cleanup first to ensure clean state
       await Factory.prisma.invitation.deleteMany();
@@ -28,12 +29,14 @@ describe('Invitation API - List', () => {
       await Factory.create('invitation', {
         ...baseData,
         email: 'list_1_' + _listSuffix + '@example.com',
-        inviter: { connect: { id: actor.id } },
+        token: 'list_1_' + _listSuffix + '',
+        team: { connect: { id: actor.id } },
       });
       await Factory.create('invitation', {
         ...baseData,
         email: 'list_2_' + _listSuffix + '@example.com',
-        inviter: { connect: { id: actor.id } },
+        token: 'list_2_' + _listSuffix + '',
+        team: { connect: { id: actor.id } },
       });
 
       const res = await client.get('/api/invitation');
@@ -45,7 +48,7 @@ describe('Invitation API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      const actor = await client.as('user', { name: 'Admin Team' });
+      const actor = await client.as('team', { role: 'TEAM_ADMIN', name: 'Admin Team' });
 
       // Cleanup and seed specific count
       await Factory.prisma.invitation.deleteMany();
@@ -64,7 +67,8 @@ describe('Invitation API - List', () => {
         const rec = await Factory.create('invitation', {
           ...baseData,
           email: `page_${i}_${_listSuffix}@example.com`,
-          inviter: { connect: { id: actor.id } },
+          token: `page_${i}_${_listSuffix}`,
+          team: { connect: { id: actor.id } },
         });
         createdIds.push(rec.id);
       }
@@ -86,23 +90,16 @@ describe('Invitation API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
       // Reuse getActorStatement to ensure correct actor context
-      const actor = await client.as('user', { name: 'Admin Team' });
-      // Note: Ensure role allows filtering if restricted
+      const actor = await client.as('team', { role: 'TEAM_ADMIN', name: 'Admin Team' });
 
       const val1 = 'email_' + Date.now() + '_A@example.com';
       const val2 = 'email_' + Date.now() + '_B@example.com';
 
-      const data1 = { ...baseData, email: val1 };
-      const data2 = { ...baseData, email: val2 };
+      const data1 = { ...baseData, email: val1, token: 'filter_a_' + Date.now() + '' };
+      const data2 = { ...baseData, email: val2, token: 'filter_b_' + Date.now() + '' };
 
-      await Factory.create('invitation', {
-        ...data1,
-        inviter: { connect: { id: actor.id } },
-      });
-      await Factory.create('invitation', {
-        ...data2,
-        inviter: { connect: { id: actor.id } },
-      });
+      await Factory.create('invitation', { ...data1, team: { connect: { id: actor.id } } });
+      await Factory.create('invitation', { ...data2, team: { connect: { id: actor.id } } });
 
       const res = await client.get('/api/invitation?email=' + val1);
       expect(res.status).toBe(200);
@@ -114,31 +111,16 @@ describe('Invitation API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
       // Reuse getActorStatement to ensure correct actor context
-      const actor = await client.as('user', { name: 'Admin Team' });
-      // Note: Ensure role allows filtering if restricted
+      const actor = await client.as('team', { role: 'TEAM_ADMIN', name: 'Admin Team' });
 
       const val1 = 'token_' + Date.now() + '_A';
       const val2 = 'token_' + Date.now() + '_B';
 
-      const data1 = {
-        ...baseData,
-        token: val1,
-        email: 'filter_a_' + Date.now() + '@example.com',
-      };
-      const data2 = {
-        ...baseData,
-        token: val2,
-        email: 'filter_b_' + Date.now() + '@example.com',
-      };
+      const data1 = { ...baseData, token: val1, email: 'filter_a_' + Date.now() + '@example.com' };
+      const data2 = { ...baseData, token: val2, email: 'filter_b_' + Date.now() + '@example.com' };
 
-      await Factory.create('invitation', {
-        ...data1,
-        inviter: { connect: { id: actor.id } },
-      });
-      await Factory.create('invitation', {
-        ...data2,
-        inviter: { connect: { id: actor.id } },
-      });
+      await Factory.create('invitation', { ...data1, team: { connect: { id: actor.id } } });
+      await Factory.create('invitation', { ...data2, team: { connect: { id: actor.id } } });
 
       const res = await client.get('/api/invitation?token=' + val1);
       expect(res.status).toBe(200);

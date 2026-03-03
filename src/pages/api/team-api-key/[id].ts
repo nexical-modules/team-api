@@ -3,13 +3,12 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 
 import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
-
 export const GET = defineApi(
   async (context, actor) => {
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'team-owner', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
 
     const select = {
       id: true,
@@ -77,7 +76,7 @@ export const DELETE = defineApi(
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'team-owner', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
 
     const result = await TeamApiKeyService.delete(id, actor);
 

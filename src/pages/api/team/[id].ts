@@ -8,7 +8,7 @@ export const GET = defineApi(
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'team-member', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_MEMBER', { ...context.params });
 
     const select = {
       id: true,
@@ -75,7 +75,7 @@ export const PUT = defineApi(
     const body = await context.request.json();
 
     // Security Check
-    await ApiGuard.protect(context, 'team-admin', { ...context.params, ...body });
+    await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params, ...body });
 
     // Zod Validation
     const schema = z
@@ -160,7 +160,7 @@ export const DELETE = defineApi(
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'team-owner', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
 
     const result = await TeamService.delete(id, actor);
 

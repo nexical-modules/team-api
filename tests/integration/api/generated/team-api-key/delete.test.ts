@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('TeamApiKey API - Delete', () => {
   let client: ApiClient;
 
@@ -13,14 +13,10 @@ describe('TeamApiKey API - Delete', () => {
   // DELETE /api/team-api-key/[id]
   describe('DELETE /api/team-api-key/[id]', () => {
     it('should delete teamApiKey', async () => {
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       const target = await Factory.create('teamApiKey', {
-        ...{
-          name: 'name_test',
-          hashedKey: 'hashedKey_test',
-          prefix: 'prefix_test',
-        },
+        ...{ name: 'name_test', hashedKey: 'hashedKey_test', prefix: 'prefix_test' },
         team: { connect: { id: actor.id } },
       });
 
@@ -28,9 +24,7 @@ describe('TeamApiKey API - Delete', () => {
 
       expect(res.status).toBe(200);
 
-      const check = await Factory.prisma.teamApiKey.findUnique({
-        where: { id: target.id },
-      });
+      const check = await Factory.prisma.teamApiKey.findUnique({ where: { id: target.id } });
       expect(check).toBeNull();
     });
   });

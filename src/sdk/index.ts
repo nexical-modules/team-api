@@ -16,6 +16,11 @@ export class TeamModule extends BaseTeamSDK {
   public teamApiKey: BaseTeamApiKeySDK;
   public teamMember: BaseTeamMemberSDK;
   public invitation: BaseInvitationSDK;
+  public static readonly roles: Record<string, string> = {
+    TEAM_OWNER: 'TEAM_OWNER',
+    TEAM_ADMIN: 'TEAM_ADMIN',
+    TEAM_MEMBER: 'TEAM_MEMBER',
+  };
 
   constructor(client: ApiClient) {
     super(client);

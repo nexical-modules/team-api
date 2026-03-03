@@ -3,7 +3,7 @@ import { HookSystem } from '@/lib/modules/hooks';
 export class TeamApiKeyHooks {
   static init() {
     // Hash Key before creation
-    HookSystem.filter('teamApiKey.beforeCreate', async (data: any) => {
+    HookSystem.filter('teamApiKey.beforeCreate', async (data: unknown) => {
       // We expect 'data' to contain the input for creation.
       // But we also need to return the RAW key to the user.
       // The Service returns the MODEL.

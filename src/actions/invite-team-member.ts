@@ -1,7 +1,7 @@
+// GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
 import crypto from 'node:crypto';
 import { db } from '@/lib/core/db';
-import type { InviteTeamMemberDTO, Invitation } from '../sdk/types';
-import { TeamRole } from '../sdk/types';
+import type { TeamRole, InviteTeamMemberDTO, Invitation } from '../sdk/types';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
 import { roleRegistry } from '@/lib/registries/role-registry';
@@ -10,6 +10,7 @@ import { InvitationService } from '../services/invitation-service';
 import { EmailRegistry } from '@/lib/email/email-registry';
 import { sendEmail } from '@/lib/email/email-sender';
 import { config } from '@/lib/core/config';
+import type { ApiActor } from '@/lib/api/api-docs';
 
 export class InviteTeamMemberAction {
   static async run(
@@ -17,12 +18,12 @@ export class InviteTeamMemberAction {
     context: APIContext,
   ): Promise<ServiceResponse<Invitation>> {
     const { teamId, email, role } = input;
-    const userId = (context.locals.actor as any)?.id;
+    const userId = (context.locals.actor as ApiActor)?.id;
 
     if (!userId) return { success: false, error: 'Unauthorized' };
 
     try {
-      await roleRegistry.check('team-admin', context, { teamId });
+      await roleRegistry.check('TEAM_ADMIN', context, { teamId });
 
       const normalizedEmail = email.toLowerCase();
       const inviter = await db.user.findUnique({ where: { id: userId } });
@@ -49,7 +50,7 @@ export class InviteTeamMemberAction {
         const result = await TeamMemberService.create({
           team: { connect: { id: teamId } },
           user: { connect: { id: existingUser.id } },
-          role: (role as TeamRole) || TeamRole.MEMBER,
+          role: (role as TeamRole) || ('TEAM_MEMBER' as TeamRole),
         });
 
         if (!result.success) return { success: false, error: result.error };
@@ -59,7 +60,7 @@ export class InviteTeamMemberAction {
         const html = await EmailRegistry.render('user:invite', {
           inviterName: inviter.name || inviter.email,
           teamName: team.name,
-          role: role || 'MEMBER',
+          role: role || 'TEAM_MEMBER',
           inviteUrl: loginUrl,
           strings: { subject: `Added to ${team.name}` }, // simplified
         });
@@ -70,7 +71,7 @@ export class InviteTeamMemberAction {
           html,
         });
 
-        return { success: true, data: { status: 'added' } as any };
+        return { success: true, data: { status: 'added' } as unknown as Invitation };
       }
 
       // 2. User does not exist, check existing invitation
@@ -89,7 +90,7 @@ export class InviteTeamMemberAction {
       const result = await InvitationService.create({
         team: { connect: { id: teamId } },
         email: normalizedEmail,
-        teamRole: (role as TeamRole) || TeamRole.MEMBER,
+        teamRole: (role as TeamRole) || ('TEAM_MEMBER' as TeamRole),
         token,
         expires,
         inviter: { connect: { id: userId } },
@@ -102,7 +103,7 @@ export class InviteTeamMemberAction {
       const html = await EmailRegistry.render('user:invite', {
         inviterName: inviter.name || inviter.email,
         teamName: team.name,
-        role: role || 'MEMBER',
+        role: role || 'TEAM_MEMBER',
         inviteUrl: registerUrl,
         strings: { subject_invite: `Invitation to join ${team.name}` },
       });
@@ -114,7 +115,7 @@ export class InviteTeamMemberAction {
       });
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return { success: false, error: error.message };
     }
   }

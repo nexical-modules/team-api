@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('Team API - List', () => {
   let client: ApiClient;
 
@@ -14,13 +14,11 @@ describe('Team API - List', () => {
   describe('GET /api/team', () => {
     const baseData = { name: 'name_test' };
 
-    it('should allow team-member to list teams', async () => {
-      const actor = await client.as('team', { name: 'Member Team' });
+    it('should allow TEAM_MEMBER to list teams', async () => {
+      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
 
       // Cleanup first to ensure clean state
-      await Factory.prisma.team.deleteMany({
-        where: { id: { not: actor.id } },
-      });
+      await Factory.prisma.team.deleteMany({ where: { id: { not: actor.id } } });
 
       // Seed data
       const _listSuffix = Date.now();
@@ -36,12 +34,10 @@ describe('Team API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      const actor = await client.as('team', { name: 'Member Team' });
+      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
 
       // Cleanup and seed specific count
-      await Factory.prisma.team.deleteMany({
-        where: { id: { not: actor.id } },
-      });
+      await Factory.prisma.team.deleteMany({ where: { id: { not: actor.id } } });
 
       const _suffix = Date.now();
       const createdIds: string[] = [];
@@ -51,9 +47,7 @@ describe('Team API - List', () => {
 
       const _listSuffix = Date.now();
       let currentCount = 0;
-      currentCount = await Factory.prisma.team.count({
-        where: { id: actor.id },
-      });
+      currentCount = await Factory.prisma.team.count({ where: { id: actor.id } });
       const toCreate = totalTarget - currentCount;
 
       for (let i = 0; i < toCreate; i++) {
@@ -79,7 +73,7 @@ describe('Team API - List', () => {
       await new Promise((r) => setTimeout(r, 10));
       // Reuse getActorStatement to ensure correct actor context
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('team', { name: 'Member Team' });
+      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
 
       const val1 = 'name_' + Date.now() + '_A';
       const val2 = 'name_' + Date.now() + '_B';

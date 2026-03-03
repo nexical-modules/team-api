@@ -4,6 +4,8 @@ import { ApiGuard } from '@/lib/api/api-guard';
 import { parseQuery } from '@/lib/api/api-query';
 import { HookSystem } from '@/lib/modules/hooks';
 import { TeamMemberService } from '@modules/team-api/src/services/team-member-service';
+import { z } from 'zod';
+import { TeamModuleTypes } from '@/lib/api';
 
 export const GET = defineApi(
   async (context, actor) => {
@@ -26,7 +28,7 @@ export const GET = defineApi(
 
     // Security Check
     // Pass query params as input to role check
-    await ApiGuard.protect(context, 'team-member', {
+    await ApiGuard.protect(context, 'TEAM_OWNER', {
       ...context.params,
       where,
       take,
@@ -459,6 +461,103 @@ export const GET = defineApi(
                   properties: {
                     total: { type: 'integer' },
                   },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+);
+export const POST = defineApi(
+  async (context, actor) => {
+    const body = await context.request.json();
+
+    // Security Check
+    await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params, ...body });
+
+    // Zod Validation
+    const schema = z.object({
+      role: z.nativeEnum(TeamModuleTypes.TeamRole).optional(),
+      userId: z.string(),
+      teamId: z.string(),
+    });
+
+    const validated = schema.parse(body);
+    const select = {
+      id: true,
+      role: true,
+      userId: true,
+      teamId: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          username: true,
+          image: true,
+          memberships: true,
+          sentInvitations: true,
+        },
+      },
+      team: true,
+      createdAt: true,
+      updatedAt: true,
+    };
+
+    const result = await TeamMemberService.create(validated, select, actor);
+
+    if (!result.success) {
+      return new Response(JSON.stringify({ error: result.error }), { status: 400 });
+    }
+
+    return new Response(JSON.stringify({ success: true, data: result.data }), { status: 201 });
+  },
+  {
+    summary: 'Create TeamMember',
+    tags: ['TeamMember'],
+    requestBody: {
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              role: { type: 'string' },
+              userId: { type: 'string' },
+              teamId: { type: 'string' },
+              user: { type: 'string' },
+              team: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+              updatedAt: { type: 'string', format: 'date-time' },
+            },
+            required: ['userId', 'teamId', 'user', 'team', 'updatedAt'],
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'OK',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                data: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    role: { type: 'string' },
+                    userId: { type: 'string' },
+                    teamId: { type: 'string' },
+                    user: { type: 'string' },
+                    team: { type: 'string' },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
+                  },
+                  required: ['userId', 'teamId', 'user', 'team', 'updatedAt'],
                 },
               },
             },

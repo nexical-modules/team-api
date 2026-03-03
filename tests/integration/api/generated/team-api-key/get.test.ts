@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { Factory } from '@tests/integration/lib/factory';
 import { TestServer } from '@tests/integration/lib/server';
+import { Factory } from '@tests/integration/lib/factory';
 describe('TeamApiKey API - Get', () => {
   let client: ApiClient;
 
@@ -13,14 +13,10 @@ describe('TeamApiKey API - Get', () => {
   // GET /api/team-api-key/[id]
   describe('GET /api/team-api-key/[id]', () => {
     it('should retrieve a specific teamApiKey', async () => {
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
 
       const target = await Factory.create('teamApiKey', {
-        ...{
-          name: 'name_test',
-          hashedKey: 'hashedKey_test',
-          prefix: 'prefix_test',
-        },
+        ...{ name: 'name_test', hashedKey: 'hashedKey_test', prefix: 'prefix_test' },
         team: { connect: { id: actor.id } },
       });
 
@@ -32,7 +28,7 @@ describe('TeamApiKey API - Get', () => {
 
     it('should return 404 for missing id', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('team', { name: 'Owner Team' });
+      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
       const res = await client.get('/api/team-api-key/missing-id-123');
       expect(res.status).toBe(404);
     });
