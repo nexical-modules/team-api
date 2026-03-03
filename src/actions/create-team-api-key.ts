@@ -47,7 +47,7 @@ export class CreateTeamApiKeyAction {
           rawKey,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       return { success: false, error: message };
     }
