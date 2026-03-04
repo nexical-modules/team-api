@@ -2,7 +2,7 @@
 import { db } from '@/lib/core/db';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
-import type { CreateTeamDTO, Team, TeamRole } from '../sdk/types';
+import { CreateTeamDTO, Team, TeamRole } from '../sdk/types';
 import { HookSystem } from '@/lib/modules/hooks';
 import type { ApiActor } from '@/lib/api/api-docs';
 

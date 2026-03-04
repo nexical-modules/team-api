@@ -1,3 +1,4 @@
+// GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
 import { randomBytes, createHash } from 'node:crypto';
 import { TeamApiKeyService } from '../services/team-api-key-service';
 import { roleRegistry } from '@/lib/registries/role-registry';
