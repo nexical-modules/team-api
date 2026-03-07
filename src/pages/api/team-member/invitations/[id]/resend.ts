@@ -3,17 +3,17 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
 import { ResendInvitationTeamMemberAction } from '@modules/team-api/src/actions/resend-invitation-team-member';
-import type { TeamApiModuleTypes } from '@/lib/api';
+import type { TeamModuleTypes } from '@/lib/api';
 
 export const POST = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)
-    const body = (await context.request.json()) as TeamApiModuleTypes.ResendInvitationDTO;
+    const body = (await context.request.json()) as TeamModuleTypes.ResendInvitationDTO;
 
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
 
     // 2. Hook: Filter Input
-    const input: TeamApiModuleTypes.ResendInvitationDTO = await HookSystem.filter(
+    const input: TeamModuleTypes.ResendInvitationDTO = await HookSystem.filter(
       'teamMember.resendInvitation.input',
       body,
     );

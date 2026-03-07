@@ -1,5 +1,5 @@
 // GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
-import { db } from '@/lib/core/db';
+import { db as database } from '@/lib/core/db';
 import { TeamRole, InviteTeamMemberDTO, Invitation } from '../sdk/types';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
@@ -25,19 +25,19 @@ export class InviteTeamMemberAction {
       await roleRegistry.check('TEAM_ADMIN', context, { teamId });
 
       const normalizedEmail = email.toLowerCase();
-      const inviter = await db.user.findUnique({ where: { id: userId } });
-      const team = await db.team.findUnique({ where: { id: teamId } });
+      const inviter = await database.user.findUnique({ where: { id: userId } });
+      const team = await database.team.findUnique({ where: { id: teamId } });
 
       if (!inviter || !team) return { success: false, error: 'Invalid inviter or team' };
 
       // 1. Check if user exists
-      const existingUser = await db.user.findUnique({
+      const existingUser = await database.user.findUnique({
         where: { email: normalizedEmail },
       });
 
       if (existingUser) {
         // Check if already a member
-        const existingMember = await db.teamMember.findUnique({
+        const existingMember = await database.teamMember.findUnique({
           where: { userId_teamId: { userId: existingUser.id, teamId } },
         });
 
@@ -74,7 +74,7 @@ export class InviteTeamMemberAction {
       }
 
       // 2. User does not exist, check existing invitation
-      const existingInvite = await db.invitation.findUnique({
+      const existingInvite = await database.invitation.findUnique({
         where: { teamId_email: { teamId: teamId, email: normalizedEmail } },
       });
 
@@ -115,7 +115,12 @@ export class InviteTeamMemberAction {
 
       return result;
     } catch (error: unknown) {
-      return { success: false, error: error.message };
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('[InviteTeamMemberAction] Error:', message);
+      if (error instanceof Error && error.stack) {
+        console.error('[InviteTeamMemberAction] Error Stack:', error.stack);
+      }
+      return { success: false, error: message };
     }
   }
 }

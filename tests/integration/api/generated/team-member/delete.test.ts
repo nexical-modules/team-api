@@ -13,13 +13,13 @@ describe('TeamMember API - Delete', () => {
   // DELETE /api/team-member/[id]
   describe('DELETE /api/team-member/[id]', () => {
     it('should delete teamMember', async () => {
-      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
-      const user_0 = await Factory.create('user', {});
+      const team_0 = await Factory.create('team', {});
       const target = await Factory.create('teamMember', {
         ...{},
-        team: { connect: { id: actor.id } },
-        user: { connect: { id: user_0.id } },
+        user: { connect: { id: actor.id } },
+        team: { connect: { id: team_0.id } },
       });
 
       const res = await client.delete(`/api/team-member/${target.id}`);

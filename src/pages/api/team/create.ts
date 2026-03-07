@@ -3,17 +3,17 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
 import { CreateTeamAction } from '@modules/team-api/src/actions/create-team';
-import type { TeamApiModuleTypes } from '@/lib/api';
+import type { TeamModuleTypes } from '@/lib/api';
 
 export const POST = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)
-    const body = (await context.request.json()) as TeamApiModuleTypes.CreateTeamDTO;
+    const body = (await context.request.json()) as TeamModuleTypes.CreateTeamDTO;
 
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
 
     // 2. Hook: Filter Input
-    const input: TeamApiModuleTypes.CreateTeamDTO = await HookSystem.filter(
+    const input: TeamModuleTypes.CreateTeamDTO = await HookSystem.filter(
       'team.createTeam.input',
       body,
     );

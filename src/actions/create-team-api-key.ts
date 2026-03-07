@@ -46,7 +46,7 @@ export class CreateTeamApiKeyAction {
         data: {
           ...result.data,
           rawKey,
-        },
+        } as unknown as TeamApiKey,
       };
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);

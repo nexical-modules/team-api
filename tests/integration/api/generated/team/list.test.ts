@@ -15,10 +15,11 @@ describe('Team API - List', () => {
     const baseData = { name: 'name_test' };
 
     it('should allow TEAM_MEMBER to list teams', async () => {
-      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
 
       // Cleanup first to ensure clean state
-      await Factory.prisma.team.deleteMany({ where: { id: { not: actor.id } } });
+      await Factory.prisma.team.deleteMany();
 
       // Seed data
       const _listSuffix = Date.now();
@@ -34,10 +35,11 @@ describe('Team API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
 
       // Cleanup and seed specific count
-      await Factory.prisma.team.deleteMany({ where: { id: { not: actor.id } } });
+      await Factory.prisma.team.deleteMany();
 
       const _suffix = Date.now();
       const createdIds: string[] = [];
@@ -46,8 +48,7 @@ describe('Team API - List', () => {
       // Check current count
 
       const _listSuffix = Date.now();
-      let currentCount = 0;
-      currentCount = await Factory.prisma.team.count({ where: { id: actor.id } });
+      const currentCount = 0;
       const toCreate = totalTarget - currentCount;
 
       for (let i = 0; i < toCreate; i++) {
@@ -73,7 +74,8 @@ describe('Team API - List', () => {
       await new Promise((r) => setTimeout(r, 10));
       // Reuse getActorStatement to ensure correct actor context
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('team', { role: 'TEAM_MEMBER', name: 'Member Team' });
+      const actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
+      // Note: Ensure role allows filtering if restricted
 
       const val1 = 'name_' + Date.now() + '_A';
       const val2 = 'name_' + Date.now() + '_B';

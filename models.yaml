@@ -1,9 +1,9 @@
 config:
   test:
     roles:
-      TEAM_OWNER: { role: 'TEAM_OWNER', name: 'Owner Team' }
-      TEAM_ADMIN: { role: 'TEAM_ADMIN', name: 'Admin Team' }
-      TEAM_MEMBER: { role: 'TEAM_MEMBER', name: 'Member Team' }
+      TEAM_OWNER: { role: 'USER_ADMIN', name: 'Owner Team' }
+      TEAM_ADMIN: { role: 'USER_ADMIN', name: 'Admin Team' }
+      TEAM_MEMBER: { role: 'USER_EMPLOYEE', name: 'Member Team' }
 
 enums:
   TeamRole:
@@ -22,11 +22,12 @@ models:
       update: TEAM_ADMIN
       delete: TEAM_OWNER
     test:
-      actor: team
+      actor: user
     actor:
       name: team
       prefix: sk_team_
       strategy: bearer
+      role: TEAM_OWNER
       fields:
         tokenModel: TeamApiKey
         ownerField: teamId
@@ -65,7 +66,7 @@ models:
       list: TEAM_OWNER
       get: TEAM_OWNER
     test:
-      actor: team
+      actor: user
     fields:
       id:
         type: String
@@ -81,6 +82,9 @@ models:
       prefix:
         type: String
       lastUsedAt:
+        type: DateTime
+        isRequired: false
+      expiresAt:
         type: DateTime
         isRequired: false
       createdAt:
@@ -102,7 +106,7 @@ models:
       update: TEAM_OWNER
       delete: TEAM_OWNER
     test:
-      actor: team
+      actor: user
     fields:
       id:
         type: String
@@ -142,9 +146,11 @@ models:
     role:
       create: 'none'
       list: TEAM_ADMIN
+      get: TEAM_MEMBER
+      update: TEAM_ADMIN
       delete: TEAM_ADMIN
     test:
-      actor: team
+      actor: user
     fields:
       id:
         type: String

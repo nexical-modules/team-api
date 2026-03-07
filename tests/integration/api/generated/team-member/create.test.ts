@@ -13,13 +13,13 @@ describe('TeamMember API - Create', () => {
   // POST /api/team-member
   describe('POST /api/team-member', () => {
     it('should allow TEAM_OWNER to create teamMember', async () => {
-      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
-      const user_0 = await Factory.create('user', {});
+      const team_0 = await Factory.create('team', {});
       const payload = {
         ...{},
-        userId: user_0.id,
-        teamId: actor ? (actor as unknown as { id: string }).id : undefined,
+        teamId: team_0.id,
+        userId: actor ? (actor as unknown as { id: string }).id : undefined,
       };
 
       const res = await client.post('/api/team-member', payload);
@@ -37,11 +37,11 @@ describe('TeamMember API - Create', () => {
       client.useToken('invalid-token');
 
       const actor = undefined as unknown;
-      const user_0 = await Factory.create('user', {});
+      const team_0 = await Factory.create('team', {});
       const payload = {
         ...{},
-        userId: user_0.id,
-        teamId: actor ? (actor as unknown as { id: string }).id : undefined,
+        teamId: team_0.id,
+        userId: actor ? (actor as unknown as { id: string }).id : undefined,
       };
       const res = await client.post('/api/team-member', payload);
       expect([401, 403, 404]).toContain(res.status);

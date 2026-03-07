@@ -39,6 +39,6 @@ export class TeamApiKeySDK extends BaseResource {
   public async createKey(
     data: CreateTeamApiKeyDTO,
   ): Promise<{ success: boolean; data: TeamApiKey; error?: string }> {
-    return this._request('POST', `${endpoint ? '/' + endpoint : ''}/keys`, data);
+    return this._request('POST', `/team-api-key/keys`, data);
   }
 }

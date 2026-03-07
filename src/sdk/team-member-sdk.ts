@@ -54,36 +54,32 @@ export class TeamMemberSDK extends BaseResource {
     data: Invitation[];
     error?: string;
   }> {
-    return this._request('GET', `${endpoint ? '/' + endpoint : ''}/invitations`);
+    return this._request('GET', `/team-member/invitations`);
   }
 
   public async inviteMember(
     data: InviteTeamMemberDTO,
   ): Promise<{ success: boolean; data: Invitation; error?: string }> {
-    return this._request('POST', `${endpoint ? '/' + endpoint : ''}/invitations`, data);
+    return this._request('POST', `/team-member/invitations`, data);
   }
 
   public async resendInvitation(
     id: string,
     data: ResendInvitationDTO,
   ): Promise<{ success: boolean; data: void; error?: string }> {
-    return this._request(
-      'POST',
-      `${endpoint ? '/' + endpoint : ''}/invitations/${id}/resend`,
-      data,
-    );
+    return this._request('POST', `/team-member/invitations/${id}/resend`, data);
   }
 
   public async acceptInvitation(
     data: AcceptInvitationDTO,
   ): Promise<{ success: boolean; data: void; error?: string }> {
-    return this._request('POST', `${endpoint ? '/' + endpoint : ''}/invitations/accept`, data);
+    return this._request('POST', `/team-member/invitations/accept`, data);
   }
 
   public async deleteInvitation(
     id: string,
   ): Promise<{ success: boolean; data: void; error?: string }> {
-    return this._request('DELETE', `${endpoint ? '/' + endpoint : ''}/invitations/${id}`);
+    return this._request('DELETE', `/team-member/invitations/${id}`);
   }
 
   public async create(

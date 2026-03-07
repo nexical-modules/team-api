@@ -20,7 +20,7 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
       context.locals.actor = {
         ...entity,
         type: 'team',
-        role: entity && 'role' in entity ? (entity as { role: string }).role : 'TEAM',
+        role: entity && 'role' in entity ? (entity as { role: string }).role : 'TEAM_OWNER',
       };
       context.locals.actorType = 'team';
       return next();

@@ -13,13 +13,13 @@ describe('TeamMember API - Update', () => {
   // PUT /api/team-member/[id]
   describe('PUT /api/team-member/[id]', () => {
     it('should update teamMember', async () => {
-      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
-      const user_0 = await Factory.create('user', {});
+      const team_0 = await Factory.create('team', {});
       const target = await Factory.create('teamMember', {
         ...{},
-        team: { connect: { id: actor.id } },
-        user: { connect: { id: user_0.id } },
+        user: { connect: { id: actor.id } },
+        team: { connect: { id: team_0.id } },
       });
 
       const updatePayload = {};
@@ -27,6 +27,8 @@ describe('TeamMember API - Update', () => {
       const res = await client.put(`/api/team-member/${target.id}`, updatePayload);
 
       expect(res.status).toBe(200);
+
+      // No specific assertions provided
     });
   });
 });

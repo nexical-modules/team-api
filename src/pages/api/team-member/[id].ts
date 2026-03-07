@@ -94,6 +94,7 @@ export const PUT = defineApi(
     // Zod Validation
     const schema = z
       .object({
+        id: z.string().optional(),
         role: z.nativeEnum(TeamModuleTypes.TeamRole).optional(),
         userId: z.string(),
         teamId: z.string(),

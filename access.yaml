@@ -1,6 +1,8 @@
 config:
   roles:
     TEAM_OWNER:
+      inherits:
+        - TEAM_MEMBER
       permissions:
         - team:update
         - team:delete
@@ -9,6 +11,8 @@ config:
         - team:invite
         - team:read_self
     TEAM_ADMIN:
+      inherits:
+        - TEAM_MEMBER
       permissions:
         - team:update
         - team:invite

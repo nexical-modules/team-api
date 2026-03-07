@@ -13,11 +13,13 @@ describe('TeamApiKey API - Delete', () => {
   // DELETE /api/team-api-key/[id]
   describe('DELETE /api/team-api-key/[id]', () => {
     it('should delete teamApiKey', async () => {
-      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
+      const team_0 = await Factory.create('team', {});
       const target = await Factory.create('teamApiKey', {
         ...{ name: 'name_test', hashedKey: 'hashedKey_test', prefix: 'prefix_test' },
-        team: { connect: { id: actor.id } },
+        team: { connect: { id: team_0.id } },
       });
 
       const res = await client.delete(`/api/team-api-key/${target.id}`);

@@ -20,6 +20,7 @@ export const factories = {
       hashedKey: `hashedKey_${index}_${crypto.randomUUID().split('-')[0]}`,
       prefix: `prefix_${index}`,
       lastUsedAt: new Date(),
+      expiresAt: new Date(),
       team: {
         create: Factory.getBuilder('team')(index),
       },

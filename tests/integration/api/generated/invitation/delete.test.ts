@@ -13,11 +13,11 @@ describe('Invitation API - Delete', () => {
   // DELETE /api/invitation/[id]
   describe('DELETE /api/invitation/[id]', () => {
     it('should delete invitation', async () => {
-      const actor = await client.as('team', { role: 'TEAM_ADMIN', name: 'Admin Team' });
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
 
       const target = await Factory.create('invitation', {
         ...{ email: 'email_test', token: 'token_test', expires: new Date().toISOString() },
-        team: { connect: { id: actor.id } },
+        inviter: { connect: { id: actor.id } },
       });
 
       const res = await client.delete(`/api/invitation/${target.id}`);

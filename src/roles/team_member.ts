@@ -1,5 +1,6 @@
 // GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
 import { BaseRole } from './base-role';
+import { roleRegistry } from '@/lib/registries/role-registry';
 
 /** */
 export class TeamMemberRole extends BaseRole {
@@ -7,4 +8,6 @@ export class TeamMemberRole extends BaseRole {
   readonly description: string = '';
   readonly inherits: string[] = [];
   readonly permissions: string[] = ['team:read_self'];
+  protected readonly compatibleRoles: string[] = [];
 }
+roleRegistry.register(new TeamMemberRole());

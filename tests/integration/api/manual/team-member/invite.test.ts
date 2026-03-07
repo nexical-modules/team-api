@@ -12,7 +12,7 @@ describe('TeamMember Action - Invite', () => {
   });
 
   it('should create an invitation for a non-existent email', async () => {
-    const owner = await client.as('user');
+    const owner = await client.as('user', { role: 'USER_ADMIN' });
     const team = await Factory.create('team');
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },
@@ -41,7 +41,7 @@ describe('TeamMember Action - Invite', () => {
   });
 
   it('should add an existing user directly to the team', async () => {
-    const owner = await client.as('user');
+    const owner = await client.as('user', { role: 'USER_ADMIN' });
     const team = await Factory.create('team');
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },
@@ -77,7 +77,7 @@ describe('TeamMember Action - Invite', () => {
   });
 
   it('should return error if user is already a member', async () => {
-    const owner = await client.as('user');
+    const owner = await client.as('user', { role: 'USER_ADMIN' });
     const team = await Factory.create('team');
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },
@@ -96,7 +96,7 @@ describe('TeamMember Action - Invite', () => {
   });
 
   it('should deny access for non-admin members', async () => {
-    const owner = await Factory.create('user');
+    const owner = await Factory.create('user', { role: 'USER_ADMIN' });
     const team = await Factory.create('team');
     await Factory.create('teamMember', {
       user: { connect: { id: owner.id } },

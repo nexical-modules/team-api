@@ -15,15 +15,15 @@ describe('TeamMember API - List', () => {
     const baseData = {};
 
     it('should allow TEAM_OWNER to list teamMembers', async () => {
-      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       // Cleanup first to ensure clean state
       await Factory.prisma.teamMember.deleteMany();
 
       // Seed data
       const _listSuffix = Date.now();
-      await Factory.create('teamMember', { ...baseData, team: { connect: { id: actor.id } } });
-      await Factory.create('teamMember', { ...baseData, team: { connect: { id: actor.id } } });
+      await Factory.create('teamMember', { ...baseData, user: { connect: { id: actor.id } } });
+      await Factory.create('teamMember', { ...baseData, user: { connect: { id: actor.id } } });
 
       const res = await client.get('/api/team-member');
 
@@ -34,7 +34,7 @@ describe('TeamMember API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      const actor = await client.as('team', { role: 'TEAM_OWNER', name: 'Owner Team' });
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       // Cleanup and seed specific count
       await Factory.prisma.teamMember.deleteMany();
@@ -52,7 +52,7 @@ describe('TeamMember API - List', () => {
       for (let i = 0; i < toCreate; i++) {
         const rec = await Factory.create('teamMember', {
           ...baseData,
-          team: { connect: { id: actor.id } },
+          user: { connect: { id: actor.id } },
         });
         createdIds.push(rec.id);
       }

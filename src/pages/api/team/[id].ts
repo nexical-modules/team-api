@@ -80,6 +80,7 @@ export const PUT = defineApi(
     // Zod Validation
     const schema = z
       .object({
+        id: z.string().optional(),
         name: z.string(),
       })
       .partial();

@@ -4,17 +4,17 @@ import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
 import { ListInvitationsTeamMemberAction } from '@modules/team-api/src/actions/list-invitations-team-member';
 import { InviteTeamMemberAction } from '@modules/team-api/src/actions/invite-team-member';
-import type { TeamApiModuleTypes } from '@/lib/api';
+import type { TeamModuleTypes } from '@/lib/api';
 
 export const GET = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)
-    const body = {} as TeamApiModuleTypes.ListInvitationsDTO;
+    const body = {} as TeamModuleTypes.ListInvitationsDTO;
 
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
 
     // 2. Hook: Filter Input
-    const input: TeamApiModuleTypes.ListInvitationsDTO = await HookSystem.filter(
+    const input: TeamModuleTypes.ListInvitationsDTO = await HookSystem.filter(
       'teamMember.listInvitations.input',
       body,
     );
@@ -79,12 +79,12 @@ export const GET = defineApi(
 export const POST = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)
-    const body = (await context.request.json()) as TeamApiModuleTypes.InviteTeamMemberDTO;
+    const body = (await context.request.json()) as TeamModuleTypes.InviteTeamMemberDTO;
 
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
 
     // 2. Hook: Filter Input
-    const input: TeamApiModuleTypes.InviteTeamMemberDTO = await HookSystem.filter(
+    const input: TeamModuleTypes.InviteTeamMemberDTO = await HookSystem.filter(
       'teamMember.inviteMember.input',
       body,
     );

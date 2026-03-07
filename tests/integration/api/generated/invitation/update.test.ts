@@ -13,11 +13,11 @@ describe('Invitation API - Update', () => {
   // PUT /api/invitation/[id]
   describe('PUT /api/invitation/[id]', () => {
     it('should update invitation', async () => {
-      const actor = await client.as('team', {});
+      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
 
       const target = await Factory.create('invitation', {
         ...{ email: 'email_test', token: 'token_test', expires: new Date().toISOString() },
-        team: { connect: { id: actor.id } },
+        inviter: { connect: { id: actor.id } },
       });
 
       const updatePayload = {

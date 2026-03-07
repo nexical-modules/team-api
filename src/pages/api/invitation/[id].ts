@@ -10,7 +10,7 @@ export const GET = defineApi(
     const { id } = context.params;
 
     // Security Check
-    await ApiGuard.protect(context, 'member', { ...context.params });
+    await ApiGuard.protect(context, 'TEAM_MEMBER', { ...context.params });
 
     const select = {
       id: true,
@@ -95,11 +95,12 @@ export const PUT = defineApi(
     const body = await context.request.json();
 
     // Security Check
-    await ApiGuard.protect(context, 'member', { ...context.params, ...body });
+    await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params, ...body });
 
     // Zod Validation
     const schema = z
       .object({
+        id: z.string().optional(),
         email: z.string(),
         teamRole: z.nativeEnum(TeamModuleTypes.TeamRole).optional(),
         teamId: z.string().optional(),
