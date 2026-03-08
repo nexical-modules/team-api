@@ -1,6 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY
 import { Permissions } from '@/lib/security/permissions';
-
 export const PermissionRegistry = {
   'team:update': {
     description: 'Update team details',
@@ -21,9 +20,7 @@ export const PermissionRegistry = {
     description: 'View team details',
   },
 } as const;
-
 export type PermissionAction = keyof typeof PermissionRegistry;
-
 export const RolePermissions = {
   TEAM_OWNER: [
     'team:update',
@@ -36,7 +33,6 @@ export const RolePermissions = {
   TEAM_ADMIN: ['team:update', 'team:invite', 'team:read_self'],
   TEAM_MEMBER: ['team:read_self'],
 } as const;
-
 export class Permission {
   public static check(action: PermissionAction, role: string): boolean {
     return Permissions.check(action, role);

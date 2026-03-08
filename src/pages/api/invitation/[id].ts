@@ -4,14 +4,11 @@ import { ApiGuard } from '@/lib/api/api-guard';
 import { z } from 'zod';
 import { InvitationService } from '@modules/team-api/src/services/invitation-service';
 import { TeamModuleTypes } from '@/lib/api';
-
 export const GET = defineApi(
   async (context, actor) => {
     const { id } = context.params;
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_MEMBER', { ...context.params });
-
     const select = {
       id: true,
       email: true,
@@ -35,9 +32,7 @@ export const GET = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-
     const result = await InvitationService.get(id, select, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -47,14 +42,12 @@ export const GET = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
-
     if (!result.data) {
       return new Response(
         JSON.stringify({ error: { code: 'NOT_FOUND', message: 'Invitation not found' } }),
         { status: 404 },
       );
     }
-
     return { success: true, data: result.data };
   },
   {
@@ -93,10 +86,8 @@ export const PUT = defineApi(
   async (context, actor) => {
     const { id } = context.params;
     const body = await context.request.json();
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params, ...body });
-
     // Zod Validation
     const schema = z
       .object({
@@ -109,7 +100,6 @@ export const PUT = defineApi(
         expires: z.string().datetime(),
       })
       .partial();
-
     const validated = schema.parse(body);
     const select = {
       id: true,
@@ -134,9 +124,7 @@ export const PUT = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-
     const result = await InvitationService.update(id, validated, select, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -146,7 +134,6 @@ export const PUT = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 400 });
     }
-
     return new Response(JSON.stringify({ success: true, data: result.data }), { status: 200 });
   },
   {
@@ -206,12 +193,9 @@ export const PUT = defineApi(
 export const DELETE = defineApi(
   async (context, actor) => {
     const { id } = context.params;
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params });
-
     const result = await InvitationService.delete(id, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -221,7 +205,6 @@ export const DELETE = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
-
     return { success: true };
   },
   {

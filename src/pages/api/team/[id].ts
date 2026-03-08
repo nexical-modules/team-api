@@ -6,10 +6,8 @@ import { TeamService } from '@modules/team-api/src/services/team-service';
 export const GET = defineApi(
   async (context, actor) => {
     const { id } = context.params;
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_MEMBER', { ...context.params });
-
     const select = {
       id: true,
       name: true,
@@ -19,9 +17,7 @@ export const GET = defineApi(
       invitations: { take: 10 },
       apiKeys: { take: 10 },
     };
-
     const result = await TeamService.get(id, select, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -31,14 +27,12 @@ export const GET = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
-
     if (!result.data) {
       return new Response(
         JSON.stringify({ error: { code: 'NOT_FOUND', message: 'Team not found' } }),
         { status: 404 },
       );
     }
-
     return { success: true, data: result.data };
   },
   {
@@ -73,10 +67,8 @@ export const PUT = defineApi(
   async (context, actor) => {
     const { id } = context.params;
     const body = await context.request.json();
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params, ...body });
-
     // Zod Validation
     const schema = z
       .object({
@@ -84,7 +76,6 @@ export const PUT = defineApi(
         name: z.string(),
       })
       .partial();
-
     const validated = schema.parse(body);
     const select = {
       id: true,
@@ -95,9 +86,7 @@ export const PUT = defineApi(
       invitations: { take: 10 },
       apiKeys: { take: 10 },
     };
-
     const result = await TeamService.update(id, validated, select, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -107,7 +96,6 @@ export const PUT = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 400 });
     }
-
     return new Response(JSON.stringify({ success: true, data: result.data }), { status: 200 });
   },
   {
@@ -159,12 +147,9 @@ export const PUT = defineApi(
 export const DELETE = defineApi(
   async (context, actor) => {
     const { id } = context.params;
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
-
     const result = await TeamService.delete(id, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -174,7 +159,6 @@ export const DELETE = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
-
     return { success: true };
   },
   {

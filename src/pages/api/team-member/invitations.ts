@@ -5,46 +5,36 @@ import { HookSystem } from '@/lib/modules/hooks';
 import { ListInvitationsTeamMemberAction } from '@modules/team-api/src/actions/list-invitations-team-member';
 import { InviteTeamMemberAction } from '@modules/team-api/src/actions/invite-team-member';
 import type { TeamModuleTypes } from '@/lib/api';
-
 export const GET = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)
     const body = {} as TeamModuleTypes.ListInvitationsDTO;
-
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
-
     // 2. Hook: Filter Input
     const input: TeamModuleTypes.ListInvitationsDTO = await HookSystem.filter(
       'teamMember.listInvitations.input',
       body,
     );
-
     // 3. Security Check
     const combinedInput = { ...context.params, ...query, ...input };
     await ApiGuard.protect(context, 'TEAM_MEMBER', combinedInput);
-
     // Inject userId from context for protected routes
     if (actor && actor.id) {
       Object.assign(combinedInput, { userId: actor.id });
     }
-
     // 4. Action Execution
     const result = await ListInvitationsTeamMemberAction.run(combinedInput, context);
-
     // 5. Hook: Filter Output
     const filteredResult = await HookSystem.filter('teamMember.listInvitations.output', result);
-
     // 6. Response
     if (!filteredResult.success) {
       return new Response(JSON.stringify({ error: filteredResult.error }), { status: 400 });
     }
-
     return { success: true, data: filteredResult.data };
   },
   {
     summary: 'List team invitations',
     tags: ['TeamMember'],
-
     responses: {
       200: {
         description: 'OK',
@@ -80,35 +70,27 @@ export const POST = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)
     const body = (await context.request.json()) as TeamModuleTypes.InviteTeamMemberDTO;
-
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
-
     // 2. Hook: Filter Input
     const input: TeamModuleTypes.InviteTeamMemberDTO = await HookSystem.filter(
       'teamMember.inviteMember.input',
       body,
     );
-
     // 3. Security Check
     const combinedInput = { ...context.params, ...query, ...input };
     await ApiGuard.protect(context, 'TEAM_ADMIN', combinedInput);
-
     // Inject userId from context for protected routes
     if (actor && actor.id) {
       Object.assign(combinedInput, { userId: actor.id });
     }
-
     // 4. Action Execution
     const result = await InviteTeamMemberAction.run(combinedInput, context);
-
     // 5. Hook: Filter Output
     const filteredResult = await HookSystem.filter('teamMember.inviteMember.output', result);
-
     // 6. Response
     if (!filteredResult.success) {
       return new Response(JSON.stringify({ error: filteredResult.error }), { status: 400 });
     }
-
     return { success: true, data: filteredResult.data };
   },
   {

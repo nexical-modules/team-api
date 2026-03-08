@@ -1,15 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
-
 import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
 export const GET = defineApi(
   async (context, actor) => {
     const { id } = context.params;
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
-
     const select = {
       id: true,
       name: true,
@@ -21,9 +18,7 @@ export const GET = defineApi(
       teamId: true,
       team: true,
     };
-
     const result = await TeamApiKeyService.get(id, select, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -33,14 +28,12 @@ export const GET = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
-
     if (!result.data) {
       return new Response(
         JSON.stringify({ error: { code: 'NOT_FOUND', message: 'TeamApiKey not found' } }),
         { status: 404 },
       );
     }
-
     return { success: true, data: result.data };
   },
   {
@@ -76,12 +69,9 @@ export const GET = defineApi(
 export const DELETE = defineApi(
   async (context, actor) => {
     const { id } = context.params;
-
     // Security Check
     await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params });
-
     const result = await TeamApiKeyService.delete(id, actor);
-
     if (!result.success) {
       if (
         result.error?.code === 'NOT_FOUND' ||
@@ -91,7 +81,6 @@ export const DELETE = defineApi(
       }
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
-
     return { success: true };
   },
   {

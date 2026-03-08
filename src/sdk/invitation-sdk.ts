@@ -1,7 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY
 import { BaseResource } from '@nexical/sdk-core';
 import type { Invitation } from './types.js';
-
 /** SDK client for Invitation. */
 export class InvitationSDK extends BaseResource {
   public async list(params?: {
@@ -27,18 +26,15 @@ export class InvitationSDK extends BaseResource {
     });
     return this._request('GET', `/invitation${query}`);
   }
-
   public async get(id: string): Promise<{ success: boolean; data: Invitation; error?: string }> {
     return this._request('GET', `/invitation/${id}`);
   }
-
   public async update(
     id: string,
     data: Partial<Invitation>,
   ): Promise<{ success: boolean; data: Invitation; error?: string }> {
     return this._request('PUT', `/invitation/${id}`, data);
   }
-
   public async delete(id: string): Promise<{ success: boolean; error?: string }> {
     return this._request('DELETE', `/invitation/${id}`);
   }
