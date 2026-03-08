@@ -14,6 +14,7 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
       include: { team: true },
     });
     const entity = tokenEntity?.team;
+
     if (entity) {
       context.locals.actor = {
         ...entity,

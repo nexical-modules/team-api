@@ -9,6 +9,7 @@ export * from './team-api-key-sdk.js';
 export * from './team-member-sdk.js';
 export * from './invitation-sdk.js';
 export * from './types.js';
+
 /** Main SDK for the team-api module. */
 export class TeamModule extends BaseTeamSDK {
   public teamApiKey: BaseTeamApiKeySDK;
@@ -19,6 +20,7 @@ export class TeamModule extends BaseTeamSDK {
     TEAM_ADMIN: 'TEAM_ADMIN',
     TEAM_MEMBER: 'TEAM_MEMBER',
   };
+
   constructor(client: ApiClient) {
     super(client);
     this.teamApiKey = new BaseTeamApiKeySDK(client);

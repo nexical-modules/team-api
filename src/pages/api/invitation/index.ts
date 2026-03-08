@@ -20,10 +20,12 @@ export const GET = defineApi(
       },
       searchFields: ['id', 'email', 'teamId', 'inviterId', 'token'],
     } as const;
+
     const { where, take, skip, orderBy } = parseQuery(
       new URL(context.request.url).searchParams,
       filterOptions,
     );
+
     // Security Check
     // Pass query params as input to role check
     await ApiGuard.protect(context, 'TEAM_ADMIN', {
@@ -33,6 +35,7 @@ export const GET = defineApi(
       skip,
       orderBy,
     });
+
     const select = {
       id: true,
       email: true,
@@ -56,17 +59,22 @@ export const GET = defineApi(
       createdAt: true,
       updatedAt: true,
     };
+
     const result = await InvitationService.list({ where, take, skip, orderBy, select }, actor);
+
     if (!result.success) {
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
+
     const data = result.data || [];
     const total = result.total || 0;
+
     // Analytics Hook
     await HookSystem.dispatch('invitation.list.viewed', {
       count: data.length,
       actorId: actor?.id || 'anonymous',
     });
+
     return { success: true, data, meta: { total } };
   },
   {

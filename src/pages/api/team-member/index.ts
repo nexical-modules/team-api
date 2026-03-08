@@ -19,10 +19,12 @@ export const GET = defineApi(
       },
       searchFields: ['id', 'userId', 'teamId'],
     } as const;
+
     const { where, take, skip, orderBy } = parseQuery(
       new URL(context.request.url).searchParams,
       filterOptions,
     );
+
     // Security Check
     // Pass query params as input to role check
     await ApiGuard.protect(context, 'TEAM_OWNER', {
@@ -32,6 +34,7 @@ export const GET = defineApi(
       skip,
       orderBy,
     });
+
     const select = {
       id: true,
       role: true,
@@ -52,17 +55,22 @@ export const GET = defineApi(
       createdAt: true,
       updatedAt: true,
     };
+
     const result = await TeamMemberService.list({ where, take, skip, orderBy, select }, actor);
+
     if (!result.success) {
       return new Response(JSON.stringify({ error: result.error }), { status: 500 });
     }
+
     const data = result.data || [];
     const total = result.total || 0;
+
     // Analytics Hook
     await HookSystem.dispatch('teamMember.list.viewed', {
       count: data.length,
       actorId: actor?.id || 'anonymous',
     });
+
     return { success: true, data, meta: { total } };
   },
   {
@@ -464,8 +472,10 @@ export const GET = defineApi(
 export const POST = defineApi(
   async (context, actor) => {
     const body = await context.request.json();
+
     // Security Check
     await ApiGuard.protect(context, 'TEAM_OWNER', { ...context.params, ...body });
+
     // Zod Validation
     const schema = z.object({
       id: z.string().optional(),
@@ -473,6 +483,7 @@ export const POST = defineApi(
       userId: z.string(),
       teamId: z.string(),
     });
+
     const validated = schema.parse(body);
     const select = {
       id: true,
@@ -494,10 +505,13 @@ export const POST = defineApi(
       createdAt: true,
       updatedAt: true,
     };
+
     const result = await TeamMemberService.create(validated, select, actor);
+
     if (!result.success) {
       return new Response(JSON.stringify({ error: result.error }), { status: 400 });
     }
+
     return new Response(JSON.stringify({ success: true, data: result.data }), { status: 201 });
   },
   {
