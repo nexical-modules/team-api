@@ -40,7 +40,6 @@ export const GET = defineApi(
       invitations: { take: 10 },
       apiKeys: { take: 10 },
     };
-
     const result = await TeamService.list({ where, take, skip, orderBy, select }, actor);
 
     if (!result.success) {
@@ -366,6 +365,7 @@ export const GET = defineApi(
         description: 'Filter by apiKeys (eq)',
       },
     ],
+
     responses: {
       200: {
         description: 'OK',

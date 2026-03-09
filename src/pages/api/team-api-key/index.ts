@@ -46,7 +46,6 @@ export const GET = defineApi(
       teamId: true,
       team: true,
     };
-
     const result = await TeamApiKeyService.list({ where, take, skip, orderBy, select }, actor);
 
     if (!result.success) {
@@ -519,6 +518,7 @@ export const GET = defineApi(
         description: 'Filter by team (eq)',
       },
     ],
+
     responses: {
       200: {
         description: 'OK',

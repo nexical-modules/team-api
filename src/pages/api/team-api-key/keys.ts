@@ -42,6 +42,7 @@ export const POST = defineApi(
   {
     summary: 'Create a new API Key (returns raw key)',
     tags: ['TeamApiKey'],
+
     requestBody: {
       content: {
         'application/json': {

@@ -38,6 +38,7 @@ export const DELETE = defineApi(
   {
     summary: 'Cancel/Delete an invitation',
     tags: ['TeamMember'],
+
     requestBody: {
       content: {
         'application/json': {

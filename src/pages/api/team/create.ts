@@ -42,6 +42,7 @@ export const POST = defineApi(
   {
     summary: 'Create a new team',
     tags: ['Team'],
+
     requestBody: {
       content: {
         'application/json': {

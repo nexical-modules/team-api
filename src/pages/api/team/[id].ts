@@ -19,7 +19,6 @@ export const GET = defineApi(
       invitations: { take: 10 },
       apiKeys: { take: 10 },
     };
-
     const result = await TeamService.get(id, select, actor);
 
     if (!result.success) {
@@ -45,6 +44,7 @@ export const GET = defineApi(
     summary: 'Get Team',
     tags: ['Team'],
     parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+
     responses: {
       200: {
         description: 'OK',
@@ -78,13 +78,10 @@ export const PUT = defineApi(
     await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params, ...body });
 
     // Zod Validation
-    const schema = z
-      .object({
-        id: z.string().optional(),
-        name: z.string(),
-      })
-      .partial();
-
+    const schema = z.object({
+      id: z.string().optional(),
+      name: z.string(),
+    });
     const validated = schema.parse(body);
     const select = {
       id: true,
@@ -95,7 +92,6 @@ export const PUT = defineApi(
       invitations: { take: 10 },
       apiKeys: { take: 10 },
     };
-
     const result = await TeamService.update(id, validated, select, actor);
 
     if (!result.success) {
@@ -181,6 +177,7 @@ export const DELETE = defineApi(
     summary: 'Delete Team',
     tags: ['Team'],
     parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+
     responses: {
       200: {
         description: 'OK',

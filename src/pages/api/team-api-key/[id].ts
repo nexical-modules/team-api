@@ -20,7 +20,6 @@ export const GET = defineApi(
       teamId: true,
       team: true,
     };
-
     const result = await TeamApiKeyService.get(id, select, actor);
 
     if (!result.success) {
@@ -46,6 +45,7 @@ export const GET = defineApi(
     summary: 'Get TeamApiKey',
     tags: ['TeamApiKey'],
     parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+
     responses: {
       200: {
         description: 'OK',
@@ -97,6 +97,7 @@ export const DELETE = defineApi(
     summary: 'Delete TeamApiKey',
     tags: ['TeamApiKey'],
     parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+
     responses: {
       200: {
         description: 'OK',

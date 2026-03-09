@@ -42,6 +42,7 @@ export const POST = defineApi(
   {
     summary: 'Resend invitation email',
     tags: ['TeamMember'],
+
     requestBody: {
       content: {
         'application/json': {

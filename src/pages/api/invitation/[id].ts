@@ -34,7 +34,6 @@ export const GET = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-
     const result = await InvitationService.get(id, select, actor);
 
     if (!result.success) {
@@ -60,6 +59,7 @@ export const GET = defineApi(
     summary: 'Get Invitation',
     tags: ['Invitation'],
     parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+
     responses: {
       200: {
         description: 'OK',
@@ -97,18 +97,15 @@ export const PUT = defineApi(
     await ApiGuard.protect(context, 'TEAM_ADMIN', { ...context.params, ...body });
 
     // Zod Validation
-    const schema = z
-      .object({
-        id: z.string().optional(),
-        email: z.string(),
-        teamRole: z.nativeEnum(TeamModuleTypes.TeamRole).optional(),
-        teamId: z.string().optional(),
-        inviterId: z.string().optional(),
-        token: z.string(),
-        expires: z.string().datetime(),
-      })
-      .partial();
-
+    const schema = z.object({
+      id: z.string().optional(),
+      email: z.string(),
+      teamRole: z.nativeEnum(TeamModuleTypes.TeamRole).optional(),
+      teamId: z.string().optional(),
+      inviterId: z.string().optional(),
+      token: z.string(),
+      expires: z.string().datetime(),
+    });
     const validated = schema.parse(body);
     const select = {
       id: true,
@@ -133,7 +130,6 @@ export const PUT = defineApi(
       createdAt: true,
       updatedAt: true,
     };
-
     const result = await InvitationService.update(id, validated, select, actor);
 
     if (!result.success) {
@@ -227,6 +223,7 @@ export const DELETE = defineApi(
     summary: 'Delete Invitation',
     tags: ['Invitation'],
     parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+
     responses: {
       200: {
         description: 'OK',
