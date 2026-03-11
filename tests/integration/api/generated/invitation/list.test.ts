@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
-import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { TestServer } from '@tests/integration/lib/server';
 import { Factory } from '@tests/integration/lib/factory';
+import { TestServer } from '@tests/integration/lib/server';
+import { beforeEach, describe, expect, it } from 'vitest';
 describe('Invitation API - List', () => {
   let client: ApiClient;
 
@@ -48,7 +48,6 @@ describe('Invitation API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-       
       const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
 
       // Cleanup and seed specific count

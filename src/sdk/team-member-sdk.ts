@@ -1,11 +1,11 @@
 // GENERATED CODE - DO NOT MODIFY
 import { BaseResource } from '@nexical/sdk-core';
 import type {
-  TeamMember,
+  AcceptInvitationDTO,
   Invitation,
   InviteTeamMemberDTO,
   ResendInvitationDTO,
-  AcceptInvitationDTO,
+  TeamMember,
 } from './types.js';
 /** SDK client for TeamMember. */
 export class TeamMemberSDK extends BaseResource {

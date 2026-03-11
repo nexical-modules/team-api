@@ -1,10 +1,10 @@
 // GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
-import { randomBytes, createHash } from 'node:crypto';
-import { TeamApiKeyService } from '../services/team-api-key-service';
 import { roleRegistry } from '@/lib/registries/role-registry';
-import type { CreateTeamApiKeyDTO, TeamApiKey } from '../sdk/types';
-import type { APIContext } from 'astro';
 import type { ServiceResponse } from '@/types/service';
+import type { APIContext } from 'astro';
+import { createHash, randomBytes } from 'node:crypto';
+import type { CreateTeamApiKeyDTO, TeamApiKey } from '../sdk/types';
+import { TeamApiKeyService } from '../services/team-api-key-service';
 
 export class CreateTeamApiKeyAction {
   private static KEY_PREFIX = 'ntk_';

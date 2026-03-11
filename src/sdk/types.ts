@@ -27,7 +27,7 @@ export interface ResendInvitationDTO {
 export interface ListInvitationsDTO {
   teamId: string;
 }
-export type { Team, TeamApiKey, TeamMember, Invitation, User } from '@prisma/client';
+export type { Invitation, Team, TeamApiKey, TeamMember, User } from '@prisma/client';
 export enum TeamRole {
   TEAM_OWNER = 'TEAM_OWNER',
   TEAM_ADMIN = 'TEAM_ADMIN',

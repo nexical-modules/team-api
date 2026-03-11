@@ -1,10 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY
+import type { TeamModuleTypes } from '@/lib/api';
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
-import { ListInvitationsTeamMemberAction } from '@modules/team-api/src/actions/list-invitations-team-member';
 import { InviteTeamMemberAction } from '@modules/team-api/src/actions/invite-team-member';
-import type { TeamModuleTypes } from '@/lib/api';
+import { ListInvitationsTeamMemberAction } from '@modules/team-api/src/actions/list-invitations-team-member';
 export const GET = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)

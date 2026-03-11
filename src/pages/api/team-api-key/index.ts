@@ -2,8 +2,8 @@
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { parseQuery } from '@/lib/api/api-query';
-import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
 import { HookSystem } from '@/lib/modules/hooks';
+import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
 export const GET = defineApi(
   async (context, actor) => {
     const filterOptions = {

@@ -1,9 +1,9 @@
 // GENERATED CODE - DO NOT MODIFY
+import type { TeamModuleTypes } from '@/lib/api';
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
 import { AcceptInvitationTeamMemberAction } from '@modules/team-api/src/actions/accept-invitation-team-member';
-import type { TeamModuleTypes } from '@/lib/api';
 export const POST = defineApi(
   async (context, actor) => {
     // 1. Body Parsing (Input)

@@ -1,9 +1,9 @@
 // GENERATED CODE - DO NOT MODIFY
+import { TeamModuleTypes } from '@/lib/api';
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
-import { z } from 'zod';
 import { InvitationService } from '@modules/team-api/src/services/invitation-service';
-import { TeamModuleTypes } from '@/lib/api';
+import { z } from 'zod';
 export const GET = defineApi(
   async (context, actor) => {
     const { id } = context.params;

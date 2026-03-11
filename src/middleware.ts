@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY
 import { db } from '@/lib/core/db';
-import crypto from 'node:crypto';
 import type { APIContext, MiddlewareNext } from 'astro';
+import crypto from 'node:crypto';
 export async function onRequest(context: APIContext, next: MiddlewareNext) {
   const publicRoutes: string[] = [];
   if (publicRoutes.some((route) => context.url.pathname.startsWith(route))) return next();

@@ -1,15 +1,15 @@
 // GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
+import type { ApiActor } from '@/lib/api/api-docs';
+import { config } from '@/lib/core/config';
 import { db as database } from '@/lib/core/db';
-import { TeamRole, InviteTeamMemberDTO, Invitation } from '../sdk/types';
-import type { ServiceResponse } from '@/types/service';
-import type { APIContext } from 'astro';
-import { roleRegistry } from '@/lib/registries/role-registry';
-import { TeamMemberService } from '../services/team-member-service';
-import { InvitationService } from '../services/invitation-service';
 import { EmailRegistry } from '@/lib/email/email-registry';
 import { sendEmail } from '@/lib/email/email-sender';
-import { config } from '@/lib/core/config';
-import type { ApiActor } from '@/lib/api/api-docs';
+import { roleRegistry } from '@/lib/registries/role-registry';
+import type { ServiceResponse } from '@/types/service';
+import type { APIContext } from 'astro';
+import { Invitation, InviteTeamMemberDTO, TeamRole } from '../sdk/types';
+import { InvitationService } from '../services/invitation-service';
+import { TeamMemberService } from '../services/team-member-service';
 
 export class InviteTeamMemberAction {
   static async run(

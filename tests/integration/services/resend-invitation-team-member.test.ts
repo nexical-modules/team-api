@@ -1,7 +1,7 @@
 // INITIAL GENERATED CODE - REVIEW AND MODIFY AS NEEDED FOR SERVICE INTEGRATION TESTS
-import { describe, it, expect } from 'vitest';
-import { ResendInvitationTeamMemberAction } from '../../../src/actions/resend-invitation-team-member';
+import { describe, expect, it } from 'vitest';
 import { createMockContext } from '../../../../../tests/integration/helpers/context';
+import { ResendInvitationTeamMemberAction } from '../../../src/actions/resend-invitation-team-member';
 import type { ResendInvitationDTO } from '../../../src/sdk';
 
 describe('ResendInvitationTeamMemberAction - Service Integration', () => {

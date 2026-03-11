@@ -1,12 +1,12 @@
 // GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
+import { config } from '@/lib/core/config';
 import { db } from '@/lib/core/db';
+import { EmailRegistry } from '@/lib/email/email-registry';
+import { sendEmail } from '@/lib/email/email-sender';
 import { roleRegistry } from '@/lib/registries/role-registry';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
 import type { ResendInvitationDTO } from '../sdk/types';
-import { EmailRegistry } from '@/lib/email/email-registry';
-import { sendEmail } from '@/lib/email/email-sender';
-import { config } from '@/lib/core/config';
 
 export class ResendInvitationTeamMemberAction {
   public static async run(

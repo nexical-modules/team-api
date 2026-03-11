@@ -1,10 +1,10 @@
 // GENERATED CODE - THE SIGNATURE IS MANAGED BY THE GENERATOR. YOU MAY MODIFY THE IMPLEMENTATION AND ADD CUSTOM IMPORTS.
+import type { ApiActor } from '@/lib/api/api-docs';
 import { db } from '@/lib/core/db';
+import { HookSystem } from '@/lib/modules/hooks';
 import type { ServiceResponse } from '@/types/service';
 import type { APIContext } from 'astro';
 import { CreateTeamDTO, Team, TeamRole } from '../sdk/types';
-import { HookSystem } from '@/lib/modules/hooks';
-import type { ApiActor } from '@/lib/api/api-docs';
 
 export class CreateTeamAction {
   public static async run(

@@ -1,8 +1,8 @@
 // INITIAL GENERATED CODE - REVIEW AND MODIFY AS NEEDED FOR SERVICE INTEGRATION TESTS
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { createMockContext } from '../../../../../tests/integration/helpers/context';
 import { CreateTeamAction } from '../../../src/actions/create-team';
 import type { CreateTeamDTO } from '../../../src/sdk';
-import { createMockContext } from '../../../../../tests/integration/helpers/context';
 describe('CreateTeamAction - Service Integration', () => {
   it.skip('should execute successfully', async () => {
     // 1. Setup prerequisite state using DataFactory

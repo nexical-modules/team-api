@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY
-import crypto from 'node:crypto';
-import bcrypt from 'bcryptjs';
 import { Factory } from '@tests/integration/lib/factory';
+import bcrypt from 'bcryptjs';
+import crypto from 'node:crypto';
 export function hashPassword(password: string): string {
   const salt = bcrypt.genSaltSync(10);
   return bcrypt.hashSync(password, salt);

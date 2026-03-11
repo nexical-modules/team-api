@@ -1,8 +1,8 @@
 // GENERATED CODE - DO NOT MODIFY
-import { describe, it, expect, beforeEach } from 'vitest';
 import { ApiClient } from '@tests/integration/lib/client';
-import { TestServer } from '@tests/integration/lib/server';
 import { Factory } from '@tests/integration/lib/factory';
+import { TestServer } from '@tests/integration/lib/server';
+import { beforeEach, describe, expect, it } from 'vitest';
 describe('TeamMember API - Create', () => {
   let client: ApiClient;
 
@@ -35,7 +35,7 @@ describe('TeamMember API - Create', () => {
 
     it('should forbid non-admin/unauthorized users', async () => {
       client.useToken('invalid-token');
-       
+
       const actor = undefined as unknown;
       const team_0 = await Factory.create('team', {});
       const payload = {

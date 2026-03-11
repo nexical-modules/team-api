@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY
 import { BaseResource } from '@nexical/sdk-core';
-import type { Team, CreateTeamDTO } from './types.js';
+import type { CreateTeamDTO, Team } from './types.js';
 /** SDK client for Team. */
 export class TeamSDK extends BaseResource {
   public async list(params?: {

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY
 import { BaseResource } from '@nexical/sdk-core';
-import type { TeamApiKey, CreateTeamApiKeyDTO } from './types.js';
+import type { CreateTeamApiKeyDTO, TeamApiKey } from './types.js';
 /** SDK client for TeamApiKey. */
 export class TeamApiKeySDK extends BaseResource {
   public async list(params?: {
