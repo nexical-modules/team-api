@@ -7,7 +7,13 @@ import type { APIContext } from 'astro';
 export class DeleteInvitationTeamMemberAction {
   public static async run(_input: void, context: APIContext): Promise<ServiceResponse<void>> {
     const { id } = context.params;
-    if (!id) return { success: false, error: 'invitation.error.missing_id' };
+    if (!id) {
+      console.log(
+        '[DeleteInvitationTeamMemberAction] Missing id. context.params:',
+        JSON.stringify(context.params),
+      );
+      return { success: false, error: 'invitation.error.missing_id' };
+    }
 
     try {
       const invitation = await db.invitation.findUnique({ where: { id } });

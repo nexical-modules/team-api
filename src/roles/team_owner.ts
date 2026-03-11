@@ -15,6 +15,6 @@ export class TeamOwnerRole extends BaseRole {
     'team:invite',
     'team:read_self',
   ];
-  protected readonly compatibleRoles: string[] = [];
+  protected readonly compatibleRoles: string[] = ['USER_ADMIN'];
 }
 roleRegistry.register(new TeamOwnerRole());

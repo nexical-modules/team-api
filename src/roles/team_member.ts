@@ -8,6 +8,6 @@ export class TeamMemberRole extends BaseRole {
   readonly description: string = '';
   readonly inherits: string[] = [];
   readonly permissions: string[] = ['team:read_self'];
-  protected readonly compatibleRoles: string[] = [];
+  protected readonly compatibleRoles: string[] = ['USER_EMPLOYEE'];
 }
 roleRegistry.register(new TeamMemberRole());

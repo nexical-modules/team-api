@@ -8,6 +8,6 @@ export class TeamAdminRole extends BaseRole {
   readonly description: string = '';
   readonly inherits: string[] = ['TEAM_MEMBER'];
   readonly permissions: string[] = ['team:update', 'team:invite', 'team:read_self'];
-  protected readonly compatibleRoles: string[] = [];
+  protected readonly compatibleRoles: string[] = ['USER_ADMIN'];
 }
 roleRegistry.register(new TeamAdminRole());
