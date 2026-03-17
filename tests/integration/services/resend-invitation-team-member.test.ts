@@ -1,8 +1,9 @@
-import { sendEmail } from '@/lib/email/email-sender';
+// INITIAL GENERATED CODE - REVIEW AND MODIFY AS NEEDED FOR SERVICE INTEGRATION TESTS
 import { EmailRegistry } from '@/lib/email/email-registry';
+import { sendEmail } from '@/lib/email/email-sender';
 import { createMockContext } from '@tests/integration/helpers/context';
 import { Factory } from '@tests/integration/lib/factory';
-import { describe, expect, it, vi, beforeEach, beforeAll } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { ResendInvitationTeamMemberAction } from '../../../src/actions/resend-invitation-team-member';
 import { init } from '../../../src/server-init';
 

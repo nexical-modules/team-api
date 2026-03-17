@@ -35,7 +35,7 @@ describe('TeamMember API - Create', () => {
 
     it('should forbid non-admin/unauthorized users', async () => {
       client.useToken('invalid-token');
-       
+
       const actor = undefined as unknown;
       const team_0 = await Factory.create('team', {});
       const payload = {
