@@ -5,6 +5,7 @@ import { Logger } from '@/lib/core/logger';
 import { HookSystem } from '@/lib/modules/hooks';
 import type { ServiceResponse } from '@/types/service';
 import type { Prisma, TeamMember } from '@prisma/client';
+
 /** Service class for TeamMember-related business logic. */
 export class TeamMemberService {
   public static async list(
@@ -13,6 +14,7 @@ export class TeamMemberService {
   ): Promise<ServiceResponse<TeamMember[]>> {
     try {
       let { where, take, skip, orderBy, select } = params || {};
+
       // Allow hooks to modify the query parameters (e.g. for scoping)
       // Pass actor context if available
       const filteredParams = await HookSystem.filter('teamMember.beforeList', {
@@ -28,17 +30,21 @@ export class TeamMemberService {
       skip = filteredParams.skip;
       orderBy = filteredParams.orderBy;
       select = filteredParams.select;
+
       const [data, total] = await db.$transaction([
         db.teamMember.findMany({ where, take, skip, orderBy, select }),
         db.teamMember.count({ where }),
       ]);
+
       const filteredData = await HookSystem.filter('teamMember.list', data);
+
       return { success: true, data: filteredData, total };
     } catch (error) {
       Logger.error('TeamMember list Error', error);
       return { success: false, error: 'teamMember.service.error.list_failed' };
     }
   }
+
   public static async get(
     id: string,
     select?: Prisma.TeamMemberSelect,
@@ -47,13 +53,16 @@ export class TeamMemberService {
     try {
       const data = await db.teamMember.findUnique({ where: { id }, select });
       if (!data) return { success: false, error: 'teamMember.service.error.not_found' };
+
       const filtered = await HookSystem.filter('teamMember.read', data, { actor });
+
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('TeamMember get Error', error);
       return { success: false, error: 'teamMember.service.error.get_failed' };
     }
   }
+
   public static async create(
     data: Prisma.TeamMemberCreateInput,
     select?: Prisma.TeamMemberSelect,
@@ -62,6 +71,7 @@ export class TeamMemberService {
     try {
       // Pass actor context to hooks for security/authorship validation
       const input = await HookSystem.filter('teamMember.beforeCreate', data, { actor });
+
       const newItem = await db.$transaction(async (tx) => {
         const created = await tx.teamMember.create({
           data: input as Prisma.TeamMemberCreateInput,
@@ -73,13 +83,16 @@ export class TeamMemberService {
         });
         return created;
       });
+
       const filtered = await HookSystem.filter('teamMember.read', newItem, { actor });
+
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('TeamMember create Error', error);
       return { success: false, error: 'teamMember.service.error.create_failed' };
     }
   }
+
   public static async update(
     id: string,
     data: Prisma.TeamMemberUpdateInput,
@@ -88,6 +101,7 @@ export class TeamMemberService {
   ): Promise<ServiceResponse<TeamMember>> {
     try {
       const input = await HookSystem.filter('teamMember.beforeUpdate', data, { actor, id });
+
       const updatedItem = await db.$transaction(async (tx) => {
         const updated = await tx.teamMember.update({
           where: { id },
@@ -101,13 +115,16 @@ export class TeamMemberService {
         });
         return updated;
       });
+
       const filtered = await HookSystem.filter('teamMember.read', updatedItem, { actor });
+
       return { success: true, data: filtered };
     } catch (error) {
       Logger.error('TeamMember update Error', error);
       return { success: false, error: 'teamMember.service.error.update_failed' };
     }
   }
+
   public static async delete(id: string, actor?: ApiActor): Promise<ServiceResponse<void>> {
     try {
       await db.$transaction(async (tx) => {

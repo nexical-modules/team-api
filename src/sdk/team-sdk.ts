@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY
 import { BaseResource } from '@nexical/sdk-core';
 import type { CreateTeamDTO, Team } from './types.js';
+
 /** SDK client for Team. */
 export class TeamSDK extends BaseResource {
   public async list(params?: {
@@ -26,18 +27,22 @@ export class TeamSDK extends BaseResource {
     });
     return this._request('GET', `/team${query}`);
   }
+
   public async get(id: string): Promise<{ success: boolean; data: Team; error?: string }> {
     return this._request('GET', `/team/${id}`);
   }
+
   public async update(
     id: string,
     data: Partial<Team>,
   ): Promise<{ success: boolean; data: Team; error?: string }> {
     return this._request('PUT', `/team/${id}`, data);
   }
+
   public async delete(id: string): Promise<{ success: boolean; error?: string }> {
     return this._request('DELETE', `/team/${id}`);
   }
+
   public async createTeam(
     data: CreateTeamDTO,
   ): Promise<{ success: boolean; data: Team; error?: string }> {

@@ -48,6 +48,7 @@ describe('Invitation API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
+       
       const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
 
       // Cleanup and seed specific count

@@ -7,6 +7,7 @@ import type {
   ResendInvitationDTO,
   TeamMember,
 } from './types.js';
+
 /** SDK client for TeamMember. */
 export class TeamMemberSDK extends BaseResource {
   public async list(params?: {
@@ -32,18 +33,28 @@ export class TeamMemberSDK extends BaseResource {
     });
     return this._request('GET', `/team-member${query}`);
   }
+
   public async get(id: string): Promise<{ success: boolean; data: TeamMember; error?: string }> {
     return this._request('GET', `/team-member/${id}`);
   }
+
+  public async create(
+    data: Partial<TeamMember>,
+  ): Promise<{ success: boolean; data: TeamMember; error?: string }> {
+    return this._request('POST', `/team-member`, data);
+  }
+
   public async update(
     id: string,
     data: Partial<TeamMember>,
   ): Promise<{ success: boolean; data: TeamMember; error?: string }> {
     return this._request('PUT', `/team-member/${id}`, data);
   }
+
   public async delete(id: string): Promise<{ success: boolean; error?: string }> {
     return this._request('DELETE', `/team-member/${id}`);
   }
+
   public async listInvitations(): Promise<{
     success: boolean;
     data: Invitation[];
@@ -51,30 +62,29 @@ export class TeamMemberSDK extends BaseResource {
   }> {
     return this._request('GET', `/team-member/invitations`);
   }
+
   public async inviteMember(
     data: InviteTeamMemberDTO,
   ): Promise<{ success: boolean; data: Invitation; error?: string }> {
     return this._request('POST', `/team-member/invitations`, data);
   }
+
   public async resendInvitation(
     id: string,
     data: ResendInvitationDTO,
   ): Promise<{ success: boolean; data: void; error?: string }> {
     return this._request('POST', `/team-member/invitations/${id}/resend`, data);
   }
+
   public async acceptInvitation(
     data: AcceptInvitationDTO,
   ): Promise<{ success: boolean; data: void; error?: string }> {
     return this._request('POST', `/team-member/invitations/accept`, data);
   }
+
   public async deleteInvitation(
     id: string,
   ): Promise<{ success: boolean; data: void; error?: string }> {
     return this._request('DELETE', `/team-member/invitations/${id}`);
-  }
-  public async create(
-    data: Partial<TeamMember>,
-  ): Promise<{ success: boolean; data: TeamMember; error?: string }> {
-    return this._request('POST', `/team-member`, data);
   }
 }

@@ -3,18 +3,22 @@ import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
 import { DeleteInvitationTeamMemberAction } from '@modules/team-api/src/actions/delete-invitation-team-member';
+
 export const DELETE = defineApi(
   async (context, actor) => {
-    // 1. Body Parsing (Input)
-    const body = (await context.request.json()) as unknown;
-
+    // 1. Parsing Input (Body + Query + Params)
+    const rawBody = await context.request.json();
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
+    const rawInput = { ...context.params, ...query, ...rawBody };
+
+    const zodSchema = null;
+    const body = (zodSchema ? zodSchema.parse(rawInput) : rawInput) as unknown;
 
     // 2. Hook: Filter Input
     const input: unknown = await HookSystem.filter('teamMember.deleteInvitation.input', body);
 
     // 3. Security Check
-    const combinedInput = { ...context.params, ...query, ...input };
+    const combinedInput = { ...input }; // input already contains params, query and body
     await ApiGuard.protect(context, 'TEAM_ADMIN', combinedInput);
 
     // Inject userId from context for protected routes
@@ -30,7 +34,7 @@ export const DELETE = defineApi(
 
     // 6. Response
     if (!filteredResult.success) {
-      return new Response(JSON.stringify({ error: filteredResult.error }), { status: 400 });
+      throw new Error(filteredResult.error || 'Internal Server Error');
     }
 
     return { success: true, data: filteredResult.data };

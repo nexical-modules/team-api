@@ -1,15 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY
-import type { TeamModuleTypes } from '@/lib/api';
+import { TeamModuleTypes } from '@/lib/api';
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { HookSystem } from '@/lib/modules/hooks';
 import { AcceptInvitationTeamMemberAction } from '@modules/team-api/src/actions/accept-invitation-team-member';
+import { z } from 'zod';
+
 export const POST = defineApi(
   async (context, actor) => {
-    // 1. Body Parsing (Input)
-    const body = (await context.request.json()) as TeamModuleTypes.AcceptInvitationDTO;
-
+    // 1. Parsing Input (Body + Query + Params)
+    const rawBody = await context.request.json();
     const query = Object.fromEntries(new URL(context.request.url).searchParams);
+    const rawInput = { ...context.params, ...query, ...rawBody };
+
+    const zodSchema = z.object({
+      token: z.string(),
+    });
+    const body = (
+      zodSchema ? zodSchema.parse(rawInput) : rawInput
+    ) as TeamModuleTypes.AcceptInvitationDTO;
 
     // 2. Hook: Filter Input
     const input: TeamModuleTypes.AcceptInvitationDTO = await HookSystem.filter(
@@ -18,7 +27,7 @@ export const POST = defineApi(
     );
 
     // 3. Security Check
-    const combinedInput = { ...context.params, ...query, ...input };
+    const combinedInput = { ...input }; // input already contains params, query and body
     await ApiGuard.protect(context, 'TEAM_MEMBER', combinedInput);
 
     // Inject userId from context for protected routes
@@ -34,7 +43,7 @@ export const POST = defineApi(
 
     // 6. Response
     if (!filteredResult.success) {
-      return new Response(JSON.stringify({ error: filteredResult.error }), { status: 400 });
+      throw new Error(filteredResult.error || 'Internal Server Error');
     }
 
     return { success: true, data: filteredResult.data };

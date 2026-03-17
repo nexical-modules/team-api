@@ -2,6 +2,7 @@
 import { defineApi } from '@/lib/api/api-docs';
 import { ApiGuard } from '@/lib/api/api-guard';
 import { TeamApiKeyService } from '@modules/team-api/src/services/team-api-key-service';
+
 export const GET = defineApi(
   async (context, actor) => {
     const { id } = context.params;
@@ -23,20 +24,11 @@ export const GET = defineApi(
     const result = await TeamApiKeyService.get(id, select, actor);
 
     if (!result.success) {
-      if (
-        result.error?.code === 'NOT_FOUND' ||
-        (typeof result.error === 'string' && result.error.includes('not_found'))
-      ) {
-        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
-      }
-      return new Response(JSON.stringify({ error: result.error }), { status: 500 });
+      throw new Error(result.error || 'Internal Server Error');
     }
 
     if (!result.data) {
-      return new Response(
-        JSON.stringify({ error: { code: 'NOT_FOUND', message: 'TeamApiKey not found' } }),
-        { status: 404 },
-      );
+      throw new Error('TeamApiKey not found');
     }
 
     return { success: true, data: result.data };
@@ -82,13 +74,7 @@ export const DELETE = defineApi(
     const result = await TeamApiKeyService.delete(id, actor);
 
     if (!result.success) {
-      if (
-        result.error?.code === 'NOT_FOUND' ||
-        (typeof result.error === 'string' && result.error.includes('not_found'))
-      ) {
-        return new Response(JSON.stringify({ error: result.error }), { status: 404 });
-      }
-      return new Response(JSON.stringify({ error: result.error }), { status: 500 });
+      throw new Error(result.error || 'Internal Server Error');
     }
 
     return { success: true };

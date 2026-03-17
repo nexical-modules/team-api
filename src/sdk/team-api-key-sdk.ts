@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY
 import { BaseResource } from '@nexical/sdk-core';
 import type { CreateTeamApiKeyDTO, TeamApiKey } from './types.js';
+
 /** SDK client for TeamApiKey. */
 export class TeamApiKeySDK extends BaseResource {
   public async list(params?: {
@@ -26,12 +27,15 @@ export class TeamApiKeySDK extends BaseResource {
     });
     return this._request('GET', `/team-api-key${query}`);
   }
+
   public async get(id: string): Promise<{ success: boolean; data: TeamApiKey; error?: string }> {
     return this._request('GET', `/team-api-key/${id}`);
   }
+
   public async delete(id: string): Promise<{ success: boolean; error?: string }> {
     return this._request('DELETE', `/team-api-key/${id}`);
   }
+
   public async createKey(
     data: CreateTeamApiKeyDTO,
   ): Promise<{ success: boolean; data: TeamApiKey; error?: string }> {
