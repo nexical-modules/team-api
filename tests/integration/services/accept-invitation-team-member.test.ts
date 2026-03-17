@@ -1,26 +1,50 @@
-// INITIAL GENERATED CODE - REVIEW AND MODIFY AS NEEDED FOR SERVICE INTEGRATION TESTS
 import { createMockContext } from '@tests/integration/helpers/context';
-import { describe, expect, it } from 'vitest';
+import { Factory } from '@tests/integration/lib/factory';
+import { describe, expect, it, beforeAll } from 'vitest';
 import { AcceptInvitationTeamMemberAction } from '../../../src/actions/accept-invitation-team-member';
-import type { AcceptInvitationDTO } from '../../../src/sdk';
+import { init } from '../../../src/server-init';
 
 describe('AcceptInvitationTeamMemberAction - Service Integration', () => {
-  it.skip('should execute successfully', async () => {
-    // 1. Setup prerequisite state using DataFactory
-    // const prerequisite = await Factory.create('someModel', { ... });
+  beforeAll(async () => {
+    await init();
+  });
 
-    // 2. Prepare Action Input
-    const input: AcceptInvitationDTO = {} as unknown as AcceptInvitationDTO; // TODO: Provide valid mock data
+  it('should allow a user to accept a valid invitation', async () => {
+    const ctx = await createMockContext('USER_EMPLOYEE', 'user');
+    const user = ctx.locals.actor as any;
+    const team = await Factory.create('team');
 
-    // 3. Prepare Mock Context with Actor
-    const ctx = await createMockContext();
-    const result = await AcceptInvitationTeamMemberAction.run(input, ctx);
+    const invitation = await Factory.create('invitation', {
+      teamId: team.id,
+      email: user.email,
+      token: 'valid-token',
+      teamRole: 'TEAM_MEMBER',
+      expires: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
+    });
 
-    // 4. Verify Database state explicitly using Prisma
-    // const record = await Factory.prisma.someModel.findUnique({ where: { id: ... } });
-    // expect(record).toBeDefined();
+    const result = await AcceptInvitationTeamMemberAction.run({ token: 'valid-token' }, ctx);
 
-    // 5. Verify the Action's direct output
+    if (!result.success) {
+      console.log('[DEBUG] AcceptInvitationTeamMemberAction error:', result.error);
+    }
+
     expect(result.success).toBe(true);
+
+    const membership = await Factory.prisma.teamMember.findUnique({
+      where: {
+        userId_teamId: {
+          teamId: team.id,
+          userId: user.id,
+        },
+      },
+    });
+
+    expect(membership).toBeDefined();
+    expect(membership?.role).toBe('TEAM_MEMBER');
+
+    const deletedInvitation = await Factory.prisma.invitation.findUnique({
+      where: { id: invitation.id },
+    });
+    expect(deletedInvitation).toBeNull();
   });
 });

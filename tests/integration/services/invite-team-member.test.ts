@@ -1,26 +1,59 @@
-// INITIAL GENERATED CODE - REVIEW AND MODIFY AS NEEDED FOR SERVICE INTEGRATION TESTS
+import { EmailRegistry } from '@/lib/email/email-registry';
+import { sendEmail } from '@/lib/email/email-sender';
 import { createMockContext } from '@tests/integration/helpers/context';
-import { describe, expect, it } from 'vitest';
+import { Factory } from '@tests/integration/lib/factory';
+import { describe, expect, it, vi, beforeAll, beforeEach } from 'vitest';
 import { InviteTeamMemberAction } from '../../../src/actions/invite-team-member';
-import type { InviteTeamMemberDTO } from '../../../src/sdk';
+import { init } from '../../../src/server-init';
 
 describe('InviteTeamMemberAction - Service Integration', () => {
-  it.skip('should execute successfully', async () => {
-    // 1. Setup prerequisite state using DataFactory
-    // const prerequisite = await Factory.create('someModel', { ... });
+  beforeAll(async () => {
+    await init();
+  });
 
-    // 2. Prepare Action Input
-    const input: InviteTeamMemberDTO = {} as unknown as InviteTeamMemberDTO; // TODO: Provide valid mock data
+  beforeEach(async () => {
+    vi.spyOn({ sendEmail }, 'sendEmail').mockResolvedValue({ success: true, messageId: 'test' });
+    vi.spyOn(EmailRegistry, 'render').mockResolvedValue('<html>Invite</html>');
+  });
 
-    // 3. Prepare Mock Context with Actor
-    const ctx = await createMockContext();
+  it('should allow a team admin to invite a member', async () => {
+    const ctx = await createMockContext('USER_EMPLOYEE', 'user');
+    const user = ctx.locals.actor as any;
+    const team = await Factory.create('team');
+
+    // Make user an admin of the team
+    await Factory.create('teamMember', {
+      teamId: team.id,
+      userId: user.id,
+      role: 'TEAM_ADMIN',
+      user: undefined,
+      team: undefined,
+    });
+
+    const input = {
+      teamId: team.id,
+      email: 'newuser@example.com',
+      role: 'TEAM_MEMBER' as any,
+    };
+
     const result = await InviteTeamMemberAction.run(input, ctx);
 
-    // 4. Verify Database state explicitly using Prisma
-    // const record = await Factory.prisma.someModel.findUnique({ where: { id: ... } });
-    // expect(record).toBeDefined();
+    if (!result.success) {
+      console.log('[DEBUG] InviteTeamMemberAction error:', result.error);
+    }
 
-    // 5. Verify the Action's direct output
     expect(result.success).toBe(true);
+
+    const invitation = await Factory.prisma.invitation.findUnique({
+      where: {
+        teamId_email: {
+          teamId: team.id,
+          email: 'newuser@example.com',
+        },
+      },
+    });
+
+    expect(invitation).toBeDefined();
+    expect(invitation?.teamRole).toBe('TEAM_MEMBER');
   });
 });

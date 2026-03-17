@@ -1,26 +1,40 @@
-// INITIAL GENERATED CODE - REVIEW AND MODIFY AS NEEDED FOR SERVICE INTEGRATION TESTS
 import { createMockContext } from '@tests/integration/helpers/context';
-import { describe, expect, it } from 'vitest';
+import { Factory } from '@tests/integration/lib/factory';
+import { describe, expect, it, beforeAll } from 'vitest';
 import { ListInvitationsTeamMemberAction } from '../../../src/actions/list-invitations-team-member';
-import type { ListInvitationsDTO } from '../../../src/sdk';
+import { init } from '../../../src/server-init';
 
 describe('ListInvitationsTeamMemberAction - Service Integration', () => {
-  it.skip('should execute successfully', async () => {
-    // 1. Setup prerequisite state using DataFactory
-    // const prerequisite = await Factory.create('someModel', { ... });
+  beforeAll(async () => {
+    await init();
+  });
 
-    // 2. Prepare Action Input
-    const input: ListInvitationsDTO = {} as unknown as ListInvitationsDTO; // TODO: Provide valid mock data
+  it('should list invitations for a team', async () => {
+    const ctx = await createMockContext('USER_EMPLOYEE', 'user');
+    const team = await Factory.create('team');
 
-    // 3. Prepare Mock Context with Actor
-    const ctx = await createMockContext();
+    // Create some invitations
+    await Factory.create('invitation', {
+      teamId: team.id,
+      email: 'user1@example.com',
+      token: 'token-1',
+    });
+    await Factory.create('invitation', {
+      teamId: team.id,
+      email: 'user2@example.com',
+      token: 'token-2',
+    });
+
+    const input = { teamId: team.id };
     const result = await ListInvitationsTeamMemberAction.run(input, ctx);
 
-    // 4. Verify Database state explicitly using Prisma
-    // const record = await Factory.prisma.someModel.findUnique({ where: { id: ... } });
-    // expect(record).toBeDefined();
+    if (!result.success) {
+      console.log('[DEBUG] ListInvitationsTeamMemberAction error:', result.error);
+    }
 
-    // 5. Verify the Action's direct output
     expect(result.success).toBe(true);
+    expect(result.data).toHaveLength(2);
+    expect(result.data?.map((i: any) => i.email)).toContain('user1@example.com');
+    expect(result.data?.map((i: any) => i.email)).toContain('user2@example.com');
   });
 });

@@ -42,6 +42,37 @@ export abstract class BaseRole implements RolePolicy {
       return false;
     };
 
+    // Database check for team membership
+    const teamId = input.teamId as string | undefined;
+    if (teamId && actor.id) {
+      try {
+        const { db } = await import('@/lib/core/db');
+        const membership = await db.teamMember.findUnique({
+          where: {
+            userId_teamId: {
+              userId: actor.id,
+              teamId,
+            },
+          },
+        });
+
+        if (membership) {
+          const membershipRole = normalizeRole(membership.role);
+          if (membershipRole === normalizedRequiredRole) return;
+
+          // Check inheritance for membership role
+          if (checkInheritance(membershipRole, normalizedRequiredRole)) return;
+        }
+      } catch (dbError) {
+        console.error(
+          `[BaseRole] Database check failed for user ${actor.id} on team ${teamId}:`,
+          dbError,
+        );
+        // Continue to primary role check
+      }
+    }
+
+    // Inheritance Check for the actor's primary role
     if (checkInheritance(normalizedActorRole, normalizedRequiredRole)) return;
 
     throw new Error(`Forbidden: required role ${this.name}`);

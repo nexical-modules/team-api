@@ -1,26 +1,48 @@
-// INITIAL GENERATED CODE - REVIEW AND MODIFY AS NEEDED FOR SERVICE INTEGRATION TESTS
 import { createMockContext } from '@tests/integration/helpers/context';
-import { describe, expect, it } from 'vitest';
+import { Factory } from '@tests/integration/lib/factory';
+import { describe, expect, it, beforeAll } from 'vitest';
 import { CreateTeamApiKeyAction } from '../../../src/actions/create-team-api-key';
-import type { CreateTeamApiKeyDTO } from '../../../src/sdk';
+import { init } from '../../../src/server-init';
 
 describe('CreateTeamApiKeyAction - Service Integration', () => {
-  it.skip('should execute successfully', async () => {
-    // 1. Setup prerequisite state using DataFactory
-    // const prerequisite = await Factory.create('someModel', { ... });
+  beforeAll(async () => {
+    await init();
+  });
 
-    // 2. Prepare Action Input
-    const input: CreateTeamApiKeyDTO = {} as unknown as CreateTeamApiKeyDTO; // TODO: Provide valid mock data
+  it('should allow a team owner to create an API key', async () => {
+    const ctx = await createMockContext('USER_EMPLOYEE', 'user');
+    const user = ctx.locals.actor as any;
+    const team = await Factory.create('team');
 
-    // 3. Prepare Mock Context with Actor
-    const ctx = await createMockContext();
+    // Make user an owner of the team
+    await Factory.create('teamMember', {
+      teamId: team.id,
+      userId: user.id,
+      role: 'TEAM_OWNER',
+      user: undefined,
+      team: undefined,
+    });
+
+    const input = {
+      teamId: team.id,
+      name: 'Test Key',
+    };
+
     const result = await CreateTeamApiKeyAction.run(input, ctx);
 
-    // 4. Verify Database state explicitly using Prisma
-    // const record = await Factory.prisma.someModel.findUnique({ where: { id: ... } });
-    // expect(record).toBeDefined();
+    if (!result.success) {
+      console.log('[DEBUG] CreateTeamApiKeyAction error:', result.error);
+    }
 
-    // 5. Verify the Action's direct output
     expect(result.success).toBe(true);
+    expect(result.data?.name).toBe('Test Key');
+    expect((result.data as any).rawKey).toBeDefined();
+
+    const apiKey = await Factory.prisma.teamApiKey.findUnique({
+      where: { id: result.data?.id },
+    });
+
+    expect(apiKey).toBeDefined();
+    expect(apiKey?.teamId).toBe(team.id);
   });
 });
