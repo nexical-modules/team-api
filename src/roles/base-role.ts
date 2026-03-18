@@ -1,5 +1,6 @@
 import type { APIContext } from 'astro';
 import type { ApiActor } from '@/lib/api/api-docs';
+import { db } from '@/lib/core/db';
 import { roleRegistry } from '@/lib/registries/role-registry';
 
 export abstract class BaseRole implements RolePolicy {
@@ -24,8 +25,25 @@ export abstract class BaseRole implements RolePolicy {
     // or be added to compatibleRoles in the generated role class.
     if (normalizeRole(actorRole) === 'USER_ADMIN') return;
 
-    const normalizedActorRole = normalizeRole(actorRole);
     const normalizedRequiredRole = normalizeRole(this.name);
+    let normalizedActorRole = normalizeRole(actorRole);
+
+    // If teamId is provided, check for team-specific role
+    const teamId = input.teamId as string | undefined;
+    if (teamId && actor.id) {
+      const membership = await db.teamMember.findUnique({
+        where: {
+          userId_teamId: {
+            userId: actor.id,
+            teamId,
+          },
+        },
+      });
+
+      if (membership) {
+        normalizedActorRole = normalizeRole(membership.role);
+      }
+    }
 
     if (normalizedActorRole === normalizedRequiredRole) return;
     if (this.compatibleRoles?.includes(normalizedActorRole)) return;
