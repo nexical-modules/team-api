@@ -99,6 +99,7 @@ models:
           - '@relation(fields: [teamId], references: [id], onDelete: Cascade)'
 
   TeamMember:
+    traits: [actor-linked]
     role:
       create: TEAM_OWNER
       list: TEAM_OWNER

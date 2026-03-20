@@ -18,7 +18,7 @@ describe('TeamMember API - GET ../../../../../src/pages/api/team-member/invitati
 
   it('should call ListInvitationsTeamMemberAction and return success', async () => {
     const query = ['GET', 'DELETE'].includes('GET'.toUpperCase())
-      ? '?id=test-id&email=test@example.com&username=testuser&name=Test&token=test-token&hostname=localhost&agentId=agent-1&teamId=team-1&userId=user-1&type=TASK&status=ACTIVE&reason=Test%20Reason&amount=100&count=10&limit=10&offset=0&search='
+      ? `?teamId=${encodeURIComponent(String('test'))}`
       : '';
     const fullUrl = 'http://localhost/api/test' + query;
 
@@ -50,7 +50,7 @@ describe('TeamMember API - GET ../../../../../src/pages/api/team-member/invitati
 
   it('should return 400 when invalid input is provided (scaffold)', async () => {
     const query = ['GET', 'DELETE'].includes('GET'.toUpperCase())
-      ? '?id=test-id&email=test@example.com&username=testuser&name=Test&token=test-token&hostname=localhost&agentId=agent-1&teamId=team-1&userId=user-1&type=TASK&status=ACTIVE&reason=Test%20Reason&amount=100&count=10&limit=10&offset=0&search='
+      ? `?teamId=${encodeURIComponent(String('test'))}`
       : '';
     const fullUrl = 'http://localhost/api/test' + query;
 
@@ -76,7 +76,7 @@ describe('TeamMember API - GET ../../../../../src/pages/api/team-member/invitati
 
   it('should return 500 when action fails', async () => {
     const query = ['GET', 'DELETE'].includes('GET'.toUpperCase())
-      ? '?id=test-id&email=test@example.com&username=testuser&name=Test&token=test-token&hostname=localhost&agentId=agent-1&teamId=team-1&userId=user-1&type=TASK&status=ACTIVE&reason=Test%20Reason&amount=100&count=10&limit=10&offset=0&search='
+      ? `?teamId=${encodeURIComponent(String('test'))}`
       : '';
     const fullUrl = 'http://localhost/api/test' + query;
 
@@ -113,7 +113,7 @@ describe('TeamMember API - POST ../../../../../src/pages/api/team-member/invitat
 
   it('should call InviteTeamMemberAction and return success', async () => {
     const query = ['GET', 'DELETE'].includes('POST'.toUpperCase())
-      ? '?id=test-id&email=test@example.com&username=testuser&name=Test&token=test-token&hostname=localhost&agentId=agent-1&teamId=team-1&userId=user-1&type=TASK&status=ACTIVE&reason=Test%20Reason&amount=100&count=10&limit=10&offset=0&search='
+      ? `?teamId=${encodeURIComponent(String('test'))}&email=${encodeURIComponent(String('test@example.com'))}&role=${encodeURIComponent(String('TEAM_OWNER'))}`
       : '';
     const fullUrl = 'http://localhost/api/test' + query;
 
@@ -125,30 +125,7 @@ describe('TeamMember API - POST ../../../../../src/pages/api/team-member/invitat
 
     mockContext.request = new Request(fullUrl, {
       method: 'POST',
-      body: JSON.stringify({
-        id: 'test-id',
-        email: 'test@example.com',
-        username: 'testuser',
-        name: 'Test',
-        password: 'password',
-        confirmPassword: 'password',
-        token: 'test-token',
-        progress: 50,
-        hostname: 'localhost',
-        agentId: 'agent-1',
-        teamId: 'team-1',
-        userId: 'user-1',
-        type: 'TASK',
-        status: 'ACTIVE',
-        capabilities: [],
-        payload: { test: true },
-        reason: 'Test Reason',
-        amount: 100,
-        count: 10,
-        limit: 10,
-        offset: 0,
-        search: '',
-      }),
+      body: JSON.stringify({ teamId: 'test', email: 'test@example.com', role: 'TEAM_OWNER' }),
     });
 
     vi.mocked(InviteTeamMemberAction.run).mockResolvedValue({
@@ -169,7 +146,7 @@ describe('TeamMember API - POST ../../../../../src/pages/api/team-member/invitat
 
   it('should return 400 when invalid input is provided (scaffold)', async () => {
     const query = ['GET', 'DELETE'].includes('POST'.toUpperCase())
-      ? '?id=test-id&email=test@example.com&username=testuser&name=Test&token=test-token&hostname=localhost&agentId=agent-1&teamId=team-1&userId=user-1&type=TASK&status=ACTIVE&reason=Test%20Reason&amount=100&count=10&limit=10&offset=0&search='
+      ? `?teamId=${encodeURIComponent(String('test'))}&email=${encodeURIComponent(String('test@example.com'))}&role=${encodeURIComponent(String('TEAM_OWNER'))}`
       : '';
     const fullUrl = 'http://localhost/api/test' + query;
 
@@ -196,7 +173,7 @@ describe('TeamMember API - POST ../../../../../src/pages/api/team-member/invitat
 
   it('should return 500 when action fails', async () => {
     const query = ['GET', 'DELETE'].includes('POST'.toUpperCase())
-      ? '?id=test-id&email=test@example.com&username=testuser&name=Test&token=test-token&hostname=localhost&agentId=agent-1&teamId=team-1&userId=user-1&type=TASK&status=ACTIVE&reason=Test%20Reason&amount=100&count=10&limit=10&offset=0&search='
+      ? `?teamId=${encodeURIComponent(String('test'))}&email=${encodeURIComponent(String('test@example.com'))}&role=${encodeURIComponent(String('TEAM_OWNER'))}`
       : '';
     const fullUrl = 'http://localhost/api/test' + query;
 
@@ -208,30 +185,7 @@ describe('TeamMember API - POST ../../../../../src/pages/api/team-member/invitat
 
     mockContext.request = new Request(fullUrl, {
       method: 'POST',
-      body: JSON.stringify({
-        id: 'test-id',
-        email: 'test@example.com',
-        username: 'testuser',
-        name: 'Test',
-        password: 'password',
-        confirmPassword: 'password',
-        token: 'test-token',
-        progress: 50,
-        hostname: 'localhost',
-        agentId: 'agent-1',
-        teamId: 'team-1',
-        userId: 'user-1',
-        type: 'TASK',
-        status: 'ACTIVE',
-        capabilities: [],
-        payload: { test: true },
-        reason: 'Test Reason',
-        amount: 100,
-        count: 10,
-        limit: 10,
-        offset: 0,
-        search: '',
-      }),
+      body: JSON.stringify({ teamId: 'test', email: 'test@example.com', role: 'TEAM_OWNER' }),
     });
 
     vi.mocked(InviteTeamMemberAction.run).mockResolvedValue({
