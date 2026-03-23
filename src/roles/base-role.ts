@@ -19,6 +19,7 @@ export abstract class BaseRole {
   ): Promise<boolean> {
     const actor = context.locals.actor as ApiActor;
     const teamId = (input.teamId as string | undefined) || (input.id as string | undefined);
+    if (!teamId) return true;
 
     if (teamId && actor?.id) {
       const membership = await db.teamMember.findUnique({
@@ -58,37 +59,51 @@ export abstract class BaseRole {
 
     const normalizedRequiredRole = normalizeRole(this.name);
 
-    // Direct match + Contextual Check
+    // 1. Direct Site Role match + Contextual Compatibility Check
     if (normalizedActorRole === normalizedRequiredRole) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(`Forbidden: Role ${this.name} context check failed`);
+      if (await this.isCompatible(context, input, data)) {
+        return;
       }
-      return;
+      throw new Error(`Forbidden: Role ${this.name} context check failed`);
     }
 
-    // Direct compatibility bypass (manual whitelist)
+    // 2. Direct compatibility bypass (manual whitelist)
     if (this.compatibleRoles.map(normalizeRole).includes(normalizedActorRole)) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(
-          `Forbidden: Role ${this.name} context check failed via compatibility whitelist`,
-        );
+      if (await this.isCompatible(context, input, data)) {
+        return;
       }
-      return;
+      throw new Error(
+        `Forbidden: Role ${this.name} context check failed via compatibility whitelist`,
+      );
     }
 
-    // Inheritance Check
-    const checkInheritance = async (roleName: string, targetRole: string): Promise<boolean> => {
-      const policy = roleRegistry.get(roleName) as any;
-      if (!policy || !('inherits' in policy)) return false;
-      const inherits = policy.inherits as string[];
-      if (inherits.map(normalizeRole).includes(targetRole)) return true;
-      for (const parent of inherits) {
-        if (await checkInheritance(parent, targetRole)) return true;
-      }
-      return false;
-    };
+    // 3. Contextual Role Check (Check membership role in the database)
+    const teamId = (input.teamId as string | undefined) || (input.id as string | undefined);
+    if (teamId && actor?.id) {
+      const membership = await db.teamMember.findUnique({
+        where: {
+          userId_teamId: {
+            userId: actor.id,
+            teamId,
+          },
+        },
+      });
 
-    if (await checkInheritance(this.name, normalizedActorRole)) {
+      if (membership) {
+        const normalizedMemberRole = normalizeRole(membership.role);
+        if (normalizedMemberRole === normalizedRequiredRole) {
+          return;
+        }
+
+        // Inheritance check for contextual role
+        if (await this.checkInheritance(normalizedMemberRole, normalizedRequiredRole)) {
+          return;
+        }
+      }
+    }
+
+    // 4. Inheritance Check for Site Role
+    if (await this.checkInheritance(normalizedActorRole, normalizedRequiredRole)) {
       if (await this.isCompatible(context, input, data)) {
         return;
       }
@@ -97,320 +112,16 @@ export abstract class BaseRole {
 
     throw new Error(`Forbidden: required role ${this.name} (actor is ${actorRole})`);
   }
-}
 
-export abstract class BaseRole {
-  abstract readonly name: string;
-  protected readonly compatibleRoles: string[] = [];
-
-  /**
-   * Overridable method for contextual role resolution (e.g. team member check).
-   * Default implementation returns true.
-   */
-  public async isCompatible(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<boolean> {
-    return true;
-  }
-
-  public async check(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<void> {
-    const actor = context.locals.actor as ApiActor;
-    if (!actor) {
-      throw new Error('Unauthorized: No actor found');
-    }
-
-    const { role: actorRole } = actor as { role: string };
+  protected async checkInheritance(roleName: string, targetRole: string): Promise<boolean> {
     const normalizeRole = (r: unknown) => String(r).toUpperCase().replace(/-/g, '_');
-
-    const normalizedActorRole = normalizeRole(actorRole);
-
-    // Global System Bypass (Super Roles)
-    if (['USER_ADMIN'].map(normalizeRole).includes(normalizedActorRole)) {
-      return;
+    const policy = roleRegistry.get(roleName) as any;
+    if (!policy || !('inherits' in policy)) return false;
+    const inherits = policy.inherits as string[];
+    if (inherits.map(normalizeRole).includes(targetRole)) return true;
+    for (const parent of inherits) {
+      if (await this.checkInheritance(parent, targetRole)) return true;
     }
-
-    const normalizedRequiredRole = normalizeRole(this.name);
-
-    // Direct match + Contextual Check
-    if (normalizedActorRole === normalizedRequiredRole) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(`Forbidden: Role ${this.name} context check failed`);
-      }
-      return;
-    }
-
-    // Direct compatibility bypass (manual whitelist)
-    if (this.compatibleRoles.map(normalizeRole).includes(normalizedActorRole)) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(
-          `Forbidden: Role ${this.name} context check failed via compatibility whitelist`,
-        );
-      }
-      return;
-    }
-
-    // Inheritance Check
-    const checkInheritance = async (roleName: string, targetRole: string): Promise<boolean> => {
-      const policy = roleRegistry.get(roleName) as any;
-      if (!policy || !('inherits' in policy)) return false;
-      const inherits = policy.inherits as string[];
-      if (inherits.map(normalizeRole).includes(targetRole)) return true;
-      for (const parent of inherits) {
-        if (await checkInheritance(parent, targetRole)) return true;
-      }
-      return false;
-    };
-
-    if (await checkInheritance(this.name, normalizedActorRole)) {
-      if (await this.isCompatible(context, input, data)) {
-        return;
-      }
-      throw new Error(`Forbidden: Role ${this.name} context check failed via inheritance`);
-    }
-
-    throw new Error(`Forbidden: required role ${this.name} (actor is ${actorRole})`);
-  }
-}
-
-export abstract class BaseRole {
-  abstract readonly name: string;
-  protected readonly compatibleRoles: string[] = [];
-
-  /**
-   * Overridable method for contextual role resolution (e.g. team member check).
-   * Default implementation returns true.
-   */
-  public async isCompatible(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<boolean> {
-    return true;
-  }
-
-  public async check(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<void> {
-    const actor = context.locals.actor as ApiActor;
-    if (!actor) {
-      throw new Error('Unauthorized: No actor found');
-    }
-
-    const { role: actorRole } = actor as { role: string };
-    const normalizeRole = (r: unknown) => String(r).toUpperCase().replace(/-/g, '_');
-
-    const normalizedActorRole = normalizeRole(actorRole);
-
-    // Global System Bypass (Super Roles)
-    if (['USER_ADMIN'].map(normalizeRole).includes(normalizedActorRole)) {
-      return;
-    }
-
-    const normalizedRequiredRole = normalizeRole(this.name);
-
-    // Direct match + Contextual Check
-    if (normalizedActorRole === normalizedRequiredRole) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(`Forbidden: Role ${this.name} context check failed`);
-      }
-      return;
-    }
-
-    // Direct compatibility bypass (manual whitelist)
-    if (this.compatibleRoles.map(normalizeRole).includes(normalizedActorRole)) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(
-          `Forbidden: Role ${this.name} context check failed via compatibility whitelist`,
-        );
-      }
-      return;
-    }
-
-    // Inheritance Check
-    const checkInheritance = async (roleName: string, targetRole: string): Promise<boolean> => {
-      const policy = roleRegistry.get(roleName) as any;
-      if (!policy || !('inherits' in policy)) return false;
-      const inherits = policy.inherits as string[];
-      if (inherits.map(normalizeRole).includes(targetRole)) return true;
-      for (const parent of inherits) {
-        if (await checkInheritance(parent, targetRole)) return true;
-      }
-      return false;
-    };
-
-    if (await checkInheritance(this.name, normalizedActorRole)) {
-      if (await this.isCompatible(context, input, data)) {
-        return;
-      }
-      throw new Error(`Forbidden: Role ${this.name} context check failed via inheritance`);
-    }
-
-    throw new Error(`Forbidden: required role ${this.name} (actor is ${actorRole})`);
-  }
-}
-
-export abstract class BaseRole {
-  abstract readonly name: string;
-  protected readonly compatibleRoles: string[] = [];
-
-  /**
-   * Overridable method for contextual role resolution (e.g. team member check).
-   * Default implementation returns true.
-   */
-  public async isCompatible(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<boolean> {
-    return true;
-  }
-
-  public async check(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<void> {
-    const actor = context.locals.actor as ApiActor;
-    if (!actor) {
-      throw new Error('Unauthorized: No actor found');
-    }
-
-    const { role: actorRole } = actor as { role: string };
-    const normalizeRole = (r: unknown) => String(r).toUpperCase().replace(/-/g, '_');
-
-    const normalizedActorRole = normalizeRole(actorRole);
-
-    // Global System Bypass (Super Roles)
-    if (['USER_ADMIN'].map(normalizeRole).includes(normalizedActorRole)) {
-      return;
-    }
-
-    const normalizedRequiredRole = normalizeRole(this.name);
-
-    // Direct match + Contextual Check
-    if (normalizedActorRole === normalizedRequiredRole) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(`Forbidden: Role ${this.name} context check failed`);
-      }
-      return;
-    }
-
-    // Direct compatibility bypass (manual whitelist)
-    if (this.compatibleRoles.map(normalizeRole).includes(normalizedActorRole)) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(
-          `Forbidden: Role ${this.name} context check failed via compatibility whitelist`,
-        );
-      }
-      return;
-    }
-
-    // Inheritance Check
-    const checkInheritance = async (roleName: string, targetRole: string): Promise<boolean> => {
-      const policy = roleRegistry.get(roleName) as any;
-      if (!policy || !('inherits' in policy)) return false;
-      const inherits = policy.inherits as string[];
-      if (inherits.map(normalizeRole).includes(targetRole)) return true;
-      for (const parent of inherits) {
-        if (await checkInheritance(parent, targetRole)) return true;
-      }
-      return false;
-    };
-
-    if (await checkInheritance(this.name, normalizedActorRole)) {
-      if (await this.isCompatible(context, input, data)) {
-        return;
-      }
-      throw new Error(`Forbidden: Role ${this.name} context check failed via inheritance`);
-    }
-
-    throw new Error(`Forbidden: required role ${this.name} (actor is ${actorRole})`);
-  }
-}
-
-export abstract class BaseRole {
-  abstract readonly name: string;
-  protected readonly compatibleRoles: string[] = [];
-
-  /**
-   * Overridable method for contextual role resolution (e.g. team member check).
-   * Default implementation returns true.
-   */
-  public async isCompatible(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<boolean> {
-    return true;
-  }
-
-  public async check(
-    context: APIContext,
-    input: Record<string, unknown> = {},
-    data?: unknown,
-  ): Promise<void> {
-    const actor = context.locals.actor as ApiActor;
-    if (!actor) {
-      throw new Error('Unauthorized: No actor found');
-    }
-
-    const { role: actorRole } = actor as { role: string };
-    const normalizeRole = (r: unknown) => String(r).toUpperCase().replace(/-/g, '_');
-
-    const normalizedActorRole = normalizeRole(actorRole);
-
-    // Global System Bypass (Super Roles)
-    if (['USER_ADMIN'].map(normalizeRole).includes(normalizedActorRole)) {
-      return;
-    }
-
-    const normalizedRequiredRole = normalizeRole(this.name);
-
-    // Direct match + Contextual Check
-    if (normalizedActorRole === normalizedRequiredRole) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(`Forbidden: Role ${this.name} context check failed`);
-      }
-      return;
-    }
-
-    // Direct compatibility bypass (manual whitelist)
-    if (this.compatibleRoles.map(normalizeRole).includes(normalizedActorRole)) {
-      if (!(await this.isCompatible(context, input, data))) {
-        throw new Error(
-          `Forbidden: Role ${this.name} context check failed via compatibility whitelist`,
-        );
-      }
-      return;
-    }
-
-    // Inheritance Check
-    const checkInheritance = async (roleName: string, targetRole: string): Promise<boolean> => {
-      const policy = roleRegistry.get(roleName) as any;
-      if (!policy || !('inherits' in policy)) return false;
-      const inherits = policy.inherits as string[];
-      if (inherits.map(normalizeRole).includes(targetRole)) return true;
-      for (const parent of inherits) {
-        if (await checkInheritance(parent, targetRole)) return true;
-      }
-      return false;
-    };
-
-    if (await checkInheritance(this.name, normalizedActorRole)) {
-      if (await this.isCompatible(context, input, data)) {
-        return;
-      }
-      throw new Error(`Forbidden: Role ${this.name} context check failed via inheritance`);
-    }
-
-    throw new Error(`Forbidden: required role ${this.name} (actor is ${actorRole})`);
+    return false;
   }
 }

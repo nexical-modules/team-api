@@ -6,9 +6,7 @@ export const actors = {
   team: async (client: ApiClient, params: Record<string, unknown> = {}) => {
     let actor;
     if (params.id) {
-      actor = await Factory.prisma.team.findUnique({ where: { id: params.id } });
-    } else if (params.email) {
-      actor = await Factory.prisma.team.findFirst({ where: { email: params.email } });
+      actor = await Factory.prisma.team.findUnique({ where: { id: params.id as string } });
     }
 
     if (!actor) {
@@ -23,8 +21,17 @@ export const actors = {
 
     dbKey = crypto.createHash('sha256').update(rawKey).digest('hex');
 
+    // Verify team exists to avoid Prisma connect errors
+    const check = await Factory.prisma.team.findUnique({ where: { id: actor.id } });
+    if (!check) {
+      throw new Error(
+        `[Actor] Team ${actor.id} was "created" but not found in DB before APK creation.`,
+      );
+    }
+
     await Factory.create('teamApiKey', {
-      team: { connect: { id: actor.id } },
+      teamId: actor.id,
+      team: undefined,
       name: 'Test Token',
       hashedKey: dbKey,
       prefix: 'sk_team_',
@@ -32,6 +39,6 @@ export const actors = {
 
     client.useToken(rawKey);
 
-    return actor;
+    return { ...actor, token: { rawKey } };
   },
 };

@@ -7,7 +7,6 @@ import { GET } from '../../../../../src/pages/api/invitation/[id]';
 import { InvitationService } from '../../../../../src/services/invitation-service';
 vi.mock('../../../../../src/services/invitation-service');
 vi.mock('@/lib/api/api-guard');
-
 describe('Invitation API - GET ../../../../../src/pages/api/invitation/[id]', () => {
   beforeEach(() => {
     vi.resetAllMocks();

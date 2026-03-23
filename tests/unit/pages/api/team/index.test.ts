@@ -7,7 +7,6 @@ import { GET } from '../../../../../src/pages/api/team/index';
 import { TeamService } from '../../../../../src/services/team-service';
 vi.mock('../../../../../src/services/team-service');
 vi.mock('@/lib/api/api-guard');
-
 describe('Team API - GET ../../../../../src/pages/api/team/index', () => {
   beforeEach(() => {
     vi.resetAllMocks();
