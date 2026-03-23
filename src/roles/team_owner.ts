@@ -6,7 +6,7 @@ import { BaseRole } from './base-role';
 export class TeamOwnerRole extends BaseRole {
   readonly name: string = 'TEAM_OWNER';
   readonly description: string = '';
-  readonly inherits: string[] = ['TEAM_ADMIN'];
+  readonly inherits: string[] = ['TEAM_MEMBER'];
   readonly permissions: string[] = [
     'team:update',
     'team:delete',
