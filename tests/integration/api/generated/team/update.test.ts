@@ -13,8 +13,7 @@ describe('Team API - Update', () => {
   // PUT /api/team/[id]
   describe('PUT /api/team/[id]', () => {
     it('should update team', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
 
       const target = await Factory.create('team', { ...{ name: 'name_test' } });
       const updatePayload = {

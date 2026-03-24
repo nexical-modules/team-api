@@ -17,7 +17,7 @@ describe('Invitation API - Get', () => {
 
       const target = await Factory.create('invitation', {
         ...{ email: 'email_test', token: 'token_test', expires: new Date().toISOString() },
-        inviter: { connect: { id: actor.id } },
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
       });
 
       const res = await client.get(`/api/invitation/${target.id}`);
@@ -27,8 +27,7 @@ describe('Invitation API - Get', () => {
     });
 
     it('should return 404 for missing id', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
+      const _actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
       const res = await client.get('/api/invitation/missing-id-123');
       expect(res.status).toBe(404);
     });

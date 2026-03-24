@@ -13,8 +13,7 @@ describe('Team API - Delete', () => {
   // DELETE /api/team/[id]
   describe('DELETE /api/team/[id]', () => {
     it('should delete team', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       const target = await Factory.create('team', { ...{ name: 'name_test' } });
 

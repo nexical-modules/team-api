@@ -15,8 +15,7 @@ describe('Team API - List', () => {
     const baseData = { name: 'name_test' };
 
     it('should allow TEAM_MEMBER to list teams', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
+      const _actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
 
       // Cleanup first to ensure clean state
       await Factory.prisma.team.deleteMany();
@@ -35,8 +34,7 @@ describe('Team API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
+      const _actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
 
       // Cleanup and seed specific count
       await Factory.prisma.team.deleteMany();
@@ -73,8 +71,7 @@ describe('Team API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
+      const _actor = await client.as('user', { role: 'USER_EMPLOYEE', name: 'Member Team' });
 
       const val1 = 'name_' + Date.now() + '_A';
       const val2 = 'name_' + Date.now() + '_B';

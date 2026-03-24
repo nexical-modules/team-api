@@ -15,8 +15,7 @@ describe('TeamApiKey API - List', () => {
     const baseData = { name: 'name_test', hashedKey: 'hashedKey_test', prefix: 'prefix_test' };
 
     it('should allow TEAM_OWNER to list teamApiKeys', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       // Cleanup first to ensure clean state
       await Factory.prisma.teamApiKey.deleteMany();
@@ -35,8 +34,7 @@ describe('TeamApiKey API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       // Cleanup and seed specific count
       await Factory.prisma.teamApiKey.deleteMany();
@@ -76,8 +74,7 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       const val1 = 'name_' + Date.now() + '_A';
       const val2 = 'name_' + Date.now() + '_B';
@@ -98,8 +95,7 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       const val1 = 'hashedKey_' + Date.now() + '_A';
       const val2 = 'hashedKey_' + Date.now() + '_B';
@@ -120,8 +116,7 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       const val1 = 'prefix_' + Date.now() + '_A';
       const val2 = 'prefix_' + Date.now() + '_B';
@@ -142,8 +137,7 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       const val1 = new Date(Date.now() - 100000).toISOString();
       const val2 = new Date(Date.now() + 100000).toISOString();
@@ -164,8 +158,7 @@ describe('TeamApiKey API - List', () => {
       // Wait to avoid collisions
       await new Promise((r) => setTimeout(r, 10));
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       const val1 = new Date(Date.now() - 100000).toISOString();
       const val2 = new Date(Date.now() + 100000).toISOString();

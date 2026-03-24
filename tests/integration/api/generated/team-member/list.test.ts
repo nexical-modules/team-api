@@ -22,8 +22,14 @@ describe('TeamMember API - List', () => {
 
       // Seed data
       const _listSuffix = Date.now();
-      await Factory.create('teamMember', { ...baseData, user: { connect: { id: actor.id } } });
-      await Factory.create('teamMember', { ...baseData, user: { connect: { id: actor.id } } });
+      await Factory.create('teamMember', {
+        ...baseData,
+        user: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
+      await Factory.create('teamMember', {
+        ...baseData,
+        user: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
 
       const res = await client.get('/api/team-member');
 
@@ -34,8 +40,7 @@ describe('TeamMember API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       // Cleanup and seed specific count
       await Factory.prisma.teamMember.deleteMany();
@@ -53,7 +58,7 @@ describe('TeamMember API - List', () => {
       for (let i = 0; i < toCreate; i++) {
         const rec = await Factory.create('teamMember', {
           ...baseData,
-          user: { connect: { id: actor.id } },
+          user: { connect: { id: _actor ? (_actor as unknown as { id: string }).id : undefined } },
         });
         createdIds.push(rec.id);
       }

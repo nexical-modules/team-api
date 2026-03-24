@@ -13,8 +13,7 @@ describe('TeamApiKey API - Get', () => {
   // GET /api/team-api-key/[id]
   describe('GET /api/team-api-key/[id]', () => {
     it('should retrieve a specific teamApiKey', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
 
       const team_0 = await Factory.create('team', {});
       const target = await Factory.create('teamApiKey', {
@@ -29,8 +28,7 @@ describe('TeamApiKey API - Get', () => {
     });
 
     it('should return 404 for missing id', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
       const res = await client.get('/api/team-api-key/missing-id-123');
       expect(res.status).toBe(404);
     });

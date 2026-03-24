@@ -17,7 +17,7 @@ describe('Invitation API - Delete', () => {
 
       const target = await Factory.create('invitation', {
         ...{ email: 'email_test', token: 'token_test', expires: new Date().toISOString() },
-        inviter: { connect: { id: actor.id } },
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
       });
 
       const res = await client.delete(`/api/invitation/${target.id}`);

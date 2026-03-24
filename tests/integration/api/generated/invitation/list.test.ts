@@ -30,13 +30,13 @@ describe('Invitation API - List', () => {
         ...baseData,
         email: 'list_1_' + _listSuffix + '@example.com',
         token: 'list_1_' + _listSuffix + '',
-        inviter: { connect: { id: actor.id } },
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
       });
       await Factory.create('invitation', {
         ...baseData,
         email: 'list_2_' + _listSuffix + '@example.com',
         token: 'list_2_' + _listSuffix + '',
-        inviter: { connect: { id: actor.id } },
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
       });
 
       const res = await client.get('/api/invitation');
@@ -48,8 +48,7 @@ describe('Invitation API - List', () => {
     });
 
     it('should verify pagination metadata', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Admin Team' });
 
       // Cleanup and seed specific count
       await Factory.prisma.invitation.deleteMany();
@@ -69,7 +68,9 @@ describe('Invitation API - List', () => {
           ...baseData,
           email: `page_${i}_${_listSuffix}@example.com`,
           token: `page_${i}_${_listSuffix}`,
-          inviter: { connect: { id: actor.id } },
+          inviter: {
+            connect: { id: _actor ? (_actor as unknown as { id: string }).id : undefined },
+          },
         });
         createdIds.push(rec.id);
       }
@@ -99,8 +100,14 @@ describe('Invitation API - List', () => {
       const data1 = { ...baseData, email: val1, token: 'filter_a_' + Date.now() + '' };
       const data2 = { ...baseData, email: val2, token: 'filter_b_' + Date.now() + '' };
 
-      await Factory.create('invitation', { ...data1, inviter: { connect: { id: actor.id } } });
-      await Factory.create('invitation', { ...data2, inviter: { connect: { id: actor.id } } });
+      await Factory.create('invitation', {
+        ...data1,
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
+      await Factory.create('invitation', {
+        ...data2,
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
 
       const res = await client.get('/api/invitation?email=' + val1);
       expect(res.status).toBe(200);
@@ -120,8 +127,14 @@ describe('Invitation API - List', () => {
       const data1 = { ...baseData, token: val1, email: 'filter_a_' + Date.now() + '@example.com' };
       const data2 = { ...baseData, token: val2, email: 'filter_b_' + Date.now() + '@example.com' };
 
-      await Factory.create('invitation', { ...data1, inviter: { connect: { id: actor.id } } });
-      await Factory.create('invitation', { ...data2, inviter: { connect: { id: actor.id } } });
+      await Factory.create('invitation', {
+        ...data1,
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
+      await Factory.create('invitation', {
+        ...data2,
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
 
       const res = await client.get('/api/invitation?token=' + val1);
       expect(res.status).toBe(200);
@@ -151,8 +164,14 @@ describe('Invitation API - List', () => {
         token: 'filter_b_' + Date.now() + '',
       };
 
-      await Factory.create('invitation', { ...data1, inviter: { connect: { id: actor.id } } });
-      await Factory.create('invitation', { ...data2, inviter: { connect: { id: actor.id } } });
+      await Factory.create('invitation', {
+        ...data1,
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
+      await Factory.create('invitation', {
+        ...data2,
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
+      });
 
       const res = await client.get('/api/invitation?expires=' + val1);
       expect(res.status).toBe(200);

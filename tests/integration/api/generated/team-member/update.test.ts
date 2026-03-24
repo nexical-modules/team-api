@@ -18,7 +18,7 @@ describe('TeamMember API - Update', () => {
       const team_0 = await Factory.create('team', {});
       const target = await Factory.create('teamMember', {
         ...{},
-        user: { connect: { id: actor.id } },
+        user: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
         team: { connect: { id: team_0.id } },
       });
       const updatePayload = {

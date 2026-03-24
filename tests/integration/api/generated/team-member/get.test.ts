@@ -18,7 +18,7 @@ describe('TeamMember API - Get', () => {
       const team_0 = await Factory.create('team', {});
       const target = await Factory.create('teamMember', {
         ...{},
-        user: { connect: { id: actor.id } },
+        user: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
         team: { connect: { id: team_0.id } },
       });
 
@@ -29,8 +29,7 @@ describe('TeamMember API - Get', () => {
     });
 
     it('should return 404 for missing id', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
+      const _actor = await client.as('user', { role: 'USER_ADMIN', name: 'Owner Team' });
       const res = await client.get('/api/team-member/missing-id-123');
       expect(res.status).toBe(404);
     });

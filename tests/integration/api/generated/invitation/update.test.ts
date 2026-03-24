@@ -17,7 +17,7 @@ describe('Invitation API - Update', () => {
 
       const target = await Factory.create('invitation', {
         ...{ email: 'email_test', token: 'token_test', expires: new Date().toISOString() },
-        inviter: { connect: { id: actor.id } },
+        inviter: { connect: { id: actor ? (actor as unknown as { id: string }).id : undefined } },
       });
       const updatePayload = {
         ...{ email: 'email_updated', token: 'token_updated', expires: new Date().toISOString() },
